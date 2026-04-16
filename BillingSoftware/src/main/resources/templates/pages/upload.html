@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel File Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .upload-container {
+            width: 60%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f7f7f7;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .upload-container input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .upload-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .upload-btn:hover {
+            background-color: #45a049;
+        }
+
+        .status {
+            margin-top: 20px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .status.success {
+            color: #28a745;
+        }
+
+        .status.failure {
+            color: #dc3545;
+        }
+
+        .results {
+            margin-top: 30px;
+        }
+
+        .results table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .results th, .results td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        .results th {
+            background-color: #f2f2f2;
+        }
+
+        .results .error {
+            color: #dc3545;
+        }
+        .results table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adds subtle shadow around the table */
+        }
+
+        .results th, .results td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+            vertical-align: middle; /* Vertically align text */
+        }
+
+        .results th {
+            background-color: #f2f2f2;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .results tr:nth-child(even) {
+            background-color: #f9f9f9; /* Alternate row color */
+        }
+
+        .results tr:hover {
+            background-color: #e2e2e2; /* Highlight row on hover */
+        }
+
+        .results .error {
+            color: #dc3545;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .results td {
+            font-size: 14px; /* Adjust text size for better readability */
+        }
+
+        .results .no-data {
+            text-align: center;
+            color: #777;
+            font-style: italic;
+        }
+
+    </style>
+</head>
+<body>
+	<a class="nav-link " href="/dashboard"> Back </a>
+<h1>Excel File Upload</h1>
+
+<div class="upload-container">
+    <form id="excelForm" enctype="multipart/form-data">
+        <input type="file" id="excelFile" name="excelFile" accept=".xlsx, .xls" required>
+        <button type="submit" class="upload-btn">Upload Excel</button>
+    </form>
+	</div>
+
+    <div class="status" id="status"></div>
+
+    <div class="results" id="results" style="display: none;">
+        <h2>Upload Results</h2>
+        <h3 id="totalSuccess"></h3>
+        <h3 id="totalFailed"></h3>
+        <table id="successTable">
+            <thead>
+                <tr>
+                    <th>Payment Date</th>
+                    <th>Distributor Name</th>
+                    <th>Invoice No</th>
+                    <th>Amount</th>
+                    <th>Payment Mode</th>
+                    <th>CN</th>
+                    <th>Remark</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <table id="failedTable" style="display: none;">
+            <thead>
+                <tr>
+                    <th>Error</th>
+                    <th>Payment Date</th>
+                    <th>Distributor Name</th>
+                    <th>Invoice No</th>
+                    <th>Amount</th>
+                    <th>Payment Mode</th>
+                    <th>CN</th>
+                    <th>Remark</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+
+<script>
+    document.getElementById("excelForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+        let file = document.getElementById("excelFile").files[0];
+        if (!file) {
+            alert("Please select a file.");
+            return;
+        }
+
+        let formData = new FormData();
+        formData.append("excelFile", file);
+
+        fetch("/uploadExcel", {  // Assuming your backend is set to handle "/uploadExcel"
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Show the result section
+            document.getElementById("results").style.display = 'block';
+            document.getElementById("status").textContent = 'Upload Complete';
+            document.getElementById("status").className = 'status success';
+
+            // Update success and failed count
+            document.getElementById("totalSuccess").textContent = `Total Successful Records: ${data.totalSuccess}`;
+            document.getElementById("totalFailed").textContent = `Total Failed Records: ${data.totalFailed}`;
+
+            // Populate success table
+            let successTable = document.getElementById("successTable").getElementsByTagName('tbody')[0];
+            successTable.innerHTML = "";
+            data.successRecords.forEach(record => {
+                let row = successTable.insertRow();
+                row.insertCell(0).textContent = record.paymentDate;
+                row.insertCell(1).textContent = record.distributorName;
+                row.insertCell(2).textContent = record.invoiceNo;
+                row.insertCell(3).textContent = record.amount;
+                row.insertCell(4).textContent = record.paymentMode;
+                row.insertCell(5).textContent = record.cn;
+                row.insertCell(6).textContent = record.remark;
+            });
+
+            // Populate failed table
+            let failedTable = document.getElementById("failedTable").getElementsByTagName('tbody')[0];
+            failedTable.innerHTML = "";
+            if (data.failedRecords.length > 0) {
+                document.getElementById("failedTable").style.display = 'block';
+                data.failedRecords.forEach(record => {
+                    let row = failedTable.insertRow();
+                    row.insertCell(0).textContent = record.error;
+                    row.insertCell(1).textContent = record.paymentDate;
+                    row.insertCell(2).textContent = record.distributorName;
+                    row.insertCell(3).textContent = record.invoiceNo;
+                    row.insertCell(4).textContent = record.amount;
+                    row.insertCell(5).textContent = record.paymentMode;
+                    row.insertCell(6).textContent = record.cn;
+                    row.insertCell(7).textContent = record.remark;
+                });
+            } else {
+                document.getElementById("failedTable").style.display = 'none';
+            }
+        })
+        .catch(error => {
+            document.getElementById("status").textContent = 'Error occurred during upload.';
+            document.getElementById("status").className = 'status failure';
+            console.error('Error uploading file:', error);
+        });
+    });
+</script>
+
+</body>
+</html>

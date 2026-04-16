@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Purchase Bill - Party Details</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+	<style>
+		.form-group {
+			margin-bottom: 0.5rem;
+			/* Reduce vertical space between fields */
+		}
+
+		.form-control-sm {
+			height: calc(1.5em + 0.5rem + 2px);
+			/* Smaller input fields */
+			padding: 0.25rem 0.5rem;
+			font-size: 0.875rem;
+		}
+
+		label {
+			font-weight: bold;
+			font-size: 0.9rem;
+		}
+
+		.card-header {
+			background-color: #f8f9fa;
+			font-weight: bold;
+		}
+	</style>
+</head>
+
+<body ng-app="purchaseApp">
+
+	<div class="container mt-4" ng-controller="partyDetailsCtrl">
+		<div class="card">
+			<div class="card-header">
+				Purchase Bill - New [Party Details]
+			</div>
+			<div class="card-body">
+				<div class="mb-3 d-flex justify-content-start">
+					<button class="btn btn-sm btn-success mr-2" ng-click="saveDetails()">Auto Save</button>
+					<button class="btn btn-sm btn-warning mr-2" ng-click="updateDetails()"
+						ng-show="isUpdateMode">Update</button>
+
+					<button class="btn btn-sm btn-primary mr-2">EDE Purchase</button>
+					<button class="btn btn-sm btn-info">Convert Purchase Challan</button>
+					<button class="btn btn-sm btn-secondary ml-3">Un-map EDE Accounts</button>
+				</div>
+
+				<form>
+					<div class="row">
+						<div class="col-md-6">
+
+							<div class="form-group row">
+								<label for="partyName" class="col-sm-3 col-form-label">Party Name</label>
+								<div class="col-sm-9">
+									<input type="text" class="form-control form-control-sm" id="partyName"
+										ng-model="formData.partyName" next-focus tabindex="3">
+									<!-- Party Suggestions -->
+									<ul class="list-group position-absolute"
+										style="z-index:1000; max-height:150px; overflow-y:auto;"
+										ng-if="suggestions.length > 0">
+										<li class="list-group-item p-1" ng-repeat="p in suggestions"
+											ng-click="selectParty(p)">
+											{{p.partyName}}
+										</li>
+									</ul>
+								</div>
+							</div>
+
+							<div class="form-group row">
+								<label for="address" class="col-sm-3 col-form-label">Address</label>
+								<div class="col-sm-9">
+									<input type="text" class="form-control form-control-sm mb-1" id="addressLine1"
+										ng-model="formData.addressLine1" next-focus tabindex="4">
+									<input type="text" class="form-control form-control-sm" id="addressLine2"
+										ng-model="formData.addressLine2" next-focus tabindex="5">
+								</div>
+							</div>
+
+							<div class="form-group row">
+								<label for="telephone" class="col-sm-3 col-form-label">Telephone</label>
+								<div class="col-sm-4">
+									<input type="tel" class="form-control form-control-sm" id="telephone"
+										ng-model="formData.telephone" next-focus tabindex="6">
+								</div>
+								<label for="faxNumber" class="col-sm-2 col-form-label">Fax Number</label>
+								<div class="col-sm-3">
+									<input type="tel" class="form-control form-control-sm" id="faxNumber"
+										ng-model="formData.faxNumber" next-focus tabindex="7">
+								</div>
+							</div>
+
+							</div>
+							<div class="col-md-6">
+
+							<div class="form-group row">
+								<label for="mobile" class="col-sm-3 col-form-label">Mobile</label>
+								<div class="col-sm-9">
+									<input type="tel" class="form-control form-control-sm" id="mobile"
+										ng-model="formData.mobile" next-focus tabindex="8">
+								</div>
+							</div>
+
+							<div class="form-group row">
+								<label for="email" class="col-sm-3 col-form-label">Email</label>
+								<div class="col-sm-9">
+									<input type="email" class="form-control form-control-sm" id="email"
+										ng-model="formData.email" next-focus tabindex="9">
+								</div>
+							</div>
+
+							<div class="form-group row">
+								<label for="contactPerson" class="col-sm-3 col-form-label">Contact Person</label>
+								<div class="col-sm-9">
+									<input type="text" class="form-control form-control-sm" id="contactPerson"
+										ng-model="formData.contactPerson" next-focus tabindex="10">
+								</div>
+							</div>
+
+
+
+						<div class="form-group row">
+							<label for="panNo" class="col-sm-3 col-form-label">PAN No.</label>
+							<div class="col-sm-4">
+								<input type="text" class="form-control form-control-sm" id="panNo"
+									ng-model="formData.panNo" next-focus tabindex="13">
+							</div>
+							<label for="gstNo" class="col-sm-2 col-form-label">GST No.</label>
+							<div class="col-sm-3">
+								<input type="text" class="form-control form-control-sm" id="gstNo"
+									ng-model="formData.gstNo" next-focus tabindex="14">
+							</div>
+						</div></div>
+
+
+					</div>
+			</div>
+			</form>
+		</div>
+		<div class="card-footer bg-light text-muted small">
+			Esc-Close Window &nbsp; Ctrl+E-EDE &nbsp; Ctrl+C-Convt Challan &nbsp; F3-New Party
+		</div>
+	</div>
+	</div>
+
+	<script>
+		// AngularJS Module Definition
+		var app = angular.module('purchaseApp', []);
+
+		/**
+		 * Custom AngularJS Directive for moving focus on Enter key press.
+		 * It relies on the 'tabindex' attribute to determine the order.
+		 */
+		app.directive('nextFocus', function () {
+			return {
+				// Priority 0, so it runs after standard input directives
+				restrict: 'A',
+				link: function (scope, element, attrs) {
+					element.bind('keydown', function (e) {
+						// Check if the key pressed is 'Enter' (keyCode 13)
+						if (e.which === 13) {
+							e.preventDefault(); // Prevent default form submission or new line
+
+							// 1. Get the current element's tabindex
+							var currentTabIndex = parseInt(attrs.tabindex);
+
+							if (isNaN(currentTabIndex)) {
+								console.warn("Input element is missing a valid tabindex attribute.");
+								return;
+							}
+
+							// 2. Calculate the next desired tabindex
+							var nextTabIndex = currentTabIndex + 1;
+
+							// 3. Find the next element using the calculated tabindex
+							// Query selector finds the element with the specified tabindex anywhere in the document
+							var nextElement = document.querySelector('[tabindex="' + nextTabIndex + '"]');
+
+							if (nextElement) {
+								// 4. Focus the next element
+								nextElement.focus();
+							} else {
+								// If no element with the next tabindex is found, 
+								// you might want to automatically submit the form or stop.
+								console.log("Reached last focusable element in sequence.");
+							}
+						}
+					});
+				}
+			};
+		});
+
+		// AngularJS Controller (kept the same as it was correct)
+		app.controller('partyDetailsCtrl', function ($scope, $http) {
+
+			// Initialize form data
+			$scope.formData = {
+				vouNo: '',
+				vouDate: '2025-11-17', // Pre-fill date as per image
+				partyName: '',
+				addressLine1: '',
+				addressLine2: '',
+				telephone: '',
+				faxNumber: '',
+				mobile: '',
+				email: '',
+				contactPerson: '',
+				dlRegNo: '',
+				vatTin: '',
+				panNo: '',
+				gstNo: '',
+				sgstPercent: 0,
+				cgstPercent: 0,
+				billNo: '',
+				transactionType: 'Credit', // Default selection
+				billDate: '2025-11-17',
+				dueDate: '2025-11-17',
+				outstandingAmount: 0.00,
+				isDataOk: 'Y'
+			};
+
+			//	$scope.formData = {};
+			$scope.suggestions = [];
+			$scope.isUpdateMode = false;
+
+			// ============================
+			// 1️⃣ Auto Search on Party Name
+			// ============================
+			$scope.$watch("formData.partyName", function (newValue) {
+				if (!newValue || newValue.length < 2) {
+					$scope.suggestions = [];
+					return;
+				}
+
+				$http.get("http://localhost:8080/api/party/search?name=" + newValue)
+					.then(function (response) {
+						$scope.suggestions = response.data;
+					});
+			});
+
+			// ============================
+			// 2️⃣ Select party from list
+			// ============================
+			$scope.selectParty = function (party) {
+				$scope.formData = angular.copy(party); // Auto-fill all fields
+				$scope.isUpdateMode = true;            // Show update button
+				$scope.suggestions = [];               // Hide suggestion dropdown
+			};
+
+			// ============================
+			// 3️⃣ SAVE New Party
+			// ============================
+			$scope.saveDetails = function () {
+
+				if (!$scope.formData.partyName || $scope.formData.partyName.trim() === "") {
+					alert("Party Name is required!");
+					return;
+				}
+
+				$http.post("http://localhost:8080/api/party", $scope.formData)
+					.then(function () {
+						alert("Record Saved Successfully!");
+						$scope.formData = {};
+						$scope.isUpdateMode = false;
+					}, function () {
+						alert("Error while saving data!");
+					});
+			};
+
+			// ============================
+			// 4️⃣ UPDATE Existing Party
+			// ============================
+			$scope.updateDetails = function () {
+
+				$http.put("http://localhost:8080/api/party/" + $scope.formData.id, $scope.formData)
+					.then(function () {
+						alert("Record Updated Successfully!");
+						$scope.isUpdateMode = false;
+						$scope.formData = {};
+					}, function () {
+						alert("Error while updating!");
+					});
+			};
+
+		});
+	</script>
+</body>
+
+</html>

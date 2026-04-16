@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html ng-app="calendarApp" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collection Calendar</title>
+  <style>
+    /* Global Styles */
+    body {
+      font-family: 'Poppins', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f2f2f2;
+      color: #333;
+    }
+
+    h1, h3, p {
+      margin: 0;
+    }
+
+    /* Summary Bar */
+    .summary-bar {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      background-color: #ffffff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      padding: 10px 20px;
+    }
+
+    .summary-bar h3 {
+      font-size: 20px;
+      color: #007bff;
+    }
+
+    .summary-bar p {
+      font-size: 16px;
+      margin-top: 5px;
+      color: #28a745;
+    }
+
+    /* Calendar Container */
+    .calendar-container {
+      margin: 20px auto;
+      padding: 15px;
+      max-width: 1200px;
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+    }
+
+    /* Calendar Header */
+    .calendar-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 10px;
+    }
+
+    .calendar-header button {
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .calendar-header button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .calendar-header span {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    /* Calendar Grid */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+    }
+
+    .calendar-day {
+      padding: 12px;
+      border-radius: 10px;
+      background-color: #f9fafb;
+      text-align: center;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 1px solid #eee;
+    }
+
+    .calendar-day.header {
+      background-color: #007bff;
+      color: #fff;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .calendar-day.today {
+      background-color: #d1ecf1;
+      border-color: #bee5eb;
+    }
+
+    .calendar-day:hover {
+      background-color: #e0f7fa;
+      transform: scale(1.03);
+    }
+
+    .calendar-day .date {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .no-amount {
+      color: #999;
+    }
+
+    /* Modal */
+    .modal {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      z-index: 20;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+      background-color: #ffffff;
+      padding: 25px;
+      border-radius: 12px;
+      max-width: 500px;
+      width: 90%;
+      animation: popup 0.4s ease;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    @keyframes popup {
+      from { transform: scale(0.7); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .close {
+      float: right;
+      font-size: 24px;
+      font-weight: bold;
+      color: #999;
+      cursor: pointer;
+    }
+
+    .close:hover {
+      color: #000;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .calendar-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    @media (max-width: 500px) {
+      .calendar-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .calendar-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .calendar-day .date {
+        font-size: 16px;
+      }
+    }
+  </style>
+
+</head>
+<body ng-controller="CalendarController">
+	<a class="nav-link " href="/dashboard"> Back </a>
+  <!-- Summary Bars -->
+  <div class="summary-bar" ng-if="viewMode === 'monthly'">
+    <h3>Monthly Collection</h3>
+    <p>{{ monthlyCollection | currency:'₹' }}</p>
+  </div>
+
+  <div class="summary-bar" ng-if="viewMode === 'weekly'">
+    <h3>Weekly Collection</h3>
+    <p>{{ weeklyCollection | currency:'₹' }}</p>
+  </div>
+
+  <!-- Calendar Container -->
+  <div class="calendar-container">
+    <div class="calendar-header">
+<!--      <button ng-click="changeView('daily')">Daily</button>-->
+      <button ng-click="changeView('weekly')">Weekly</button>
+      <button ng-click="changeView('monthly')">Monthly</button>
+      <button ng-click="prev()">&#9664; Prev</button>
+      <span>{{ currentDate | date: 'MMMM yyyy' }}</span>
+      <button ng-click="next()">Next &#9654;</button>
+    </div>
+
+    <!-- Calendar Content -->
+    <div class="calendar-grid" ng-if="viewMode === 'monthly'">
+      <div class="calendar-day header">Sun</div>
+      <div class="calendar-day header">Mon</div>
+      <div class="calendar-day header">Tue</div>
+      <div class="calendar-day header">Wed</div>
+      <div class="calendar-day header">Thu</div>
+      <div class="calendar-day header">Fri</div>
+      <div class="calendar-day header">Sat</div>
+
+      <div class="calendar-day" ng-repeat="day in calendarDays" ng-click="selectDate(day)">
+        <span class="date">{{ day.date | date: 'd' }}</span>
+        <p ng-class="{'no-amount': day.totalPayment === 0}">{{ day.totalPayment | currency:'₹' }}</p>
+      </div>
+    </div>
+
+    <div class="calendar-grid" ng-if="viewMode === 'weekly'">
+      <div class="calendar-day" ng-repeat="day in weeklyRecords" ng-click="selectDate(day)">
+        <h3>{{ day.date | date: 'EEE, MMM d' }}</h3>
+        <p>Total: {{ day.totalAmount | currency:'₹' }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Displaying Selected Date Data -->
+  <div class="modal" ng-if="selectedDate" ng-show="selectedDate">
+    <div class="modal-content">
+      <span class="close" ng-click="closeModal()">&times;</span>
+      <h3>Payment Details for {{ selectedDate | date: 'd MMMM yyyy' }}</h3>
+      <div>
+        <p><strong>Online Payment:</strong> {{ selectedDateData.onlinePayment | currency:'₹' }}</p>
+        <p><strong>Cash Payment:</strong> {{ selectedDateData.cashPayment | currency:'₹' }}</p>
+        <p><strong>Total Payment:</strong> {{ selectedDateData.totalPayment | currency:'₹' }}</p>
+      </div>
+    </div>
+  </div>
+  <script src="../assets/js/config.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <script>
+    var app = angular.module('calendarApp', []);
+    app.controller('CalendarController', function ($scope, $http, $filter) {
+      $scope.viewMode = 'monthly'; // Default view
+      $scope.currentDate = new Date();
+
+      // Fetch records
+      $scope.fetchRecords = function () {
+        $http.get('/api/payments').then(function (response) {
+          $scope.records = response.data;
+          $scope.updateCalendar();
+        });
+      };
+
+      // Update calendar views
+      $scope.updateCalendar = function () {
+        if ($scope.viewMode === 'monthly') {
+          $scope.updateMonthlyRecords();
+        } else if ($scope.viewMode === 'weekly') {
+          $scope.updateWeeklyRecords();
+        }
+      };
+
+      // Update Monthly Records
+      $scope.updateMonthlyRecords = function () {
+        const firstDay = new Date($scope.currentDate.getFullYear(), $scope.currentDate.getMonth(), 1);
+        const lastDay = new Date($scope.currentDate.getFullYear(), $scope.currentDate.getMonth() + 1, 0);
+        const today = $filter('date')(new Date(), 'yyyy-MM-dd');
+
+        $scope.calendarDays = [];
+        let monthlyTotal = 0;
+
+        for (let d = new Date(firstDay); d <= lastDay; d.setDate(d.getDate() + 1)) {
+          const day = $filter('date')(d, 'yyyy-MM-dd');
+          const records = $scope.records.filter(record => record.paymentDate === day);
+          const totalAmount = records.reduce((sum, r) => sum + (r.totalPayment || 0), 0);
+
+          monthlyTotal += totalAmount;
+
+          $scope.calendarDays.push({
+            date: new Date(d),
+            totalPayment: totalAmount,
+            isToday: day === today,
+          });
+        }
+
+        $scope.monthlyCollection = monthlyTotal;
+      };
+
+      // Update Weekly Records
+      $scope.updateWeeklyRecords = function () {
+        const startOfWeek = $scope.getStartOfWeek($scope.currentDate);
+        const endOfWeek = $scope.getEndOfWeek($scope.currentDate);
+        let weeklyTotal = 0;
+
+        $scope.weeklyRecords = [];
+        for (let d = new Date(startOfWeek); d <= endOfWeek; d.setDate(d.getDate() + 1)) {
+          const day = $filter('date')(d, 'yyyy-MM-dd');
+          const records = $scope.records.filter(record => record.paymentDate === day);
+          const totalAmount = records.reduce((sum, r) => sum + (r.totalPayment || 0), 0);
+
+          weeklyTotal += totalAmount;
+
+          $scope.weeklyRecords.push({
+            date: new Date(d),
+            totalAmount: totalAmount,
+          });
+        }
+
+        $scope.weeklyCollection = weeklyTotal;
+      };
+
+      // Helper Functions for Weekly Calculation
+      $scope.getStartOfWeek = function (date) {
+        const day = date.getDay();
+        const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+        return new Date(date.setDate(diff));
+      };
+
+      $scope.getEndOfWeek = function (date) {
+        const startOfWeek = $scope.getStartOfWeek(new Date(date));
+        return new Date(startOfWeek.setDate(startOfWeek.getDate() + 6));
+      };
+
+      // Navigation and View Switching
+      $scope.prev = function () {
+        if ($scope.viewMode === 'monthly') {
+          $scope.currentDate.setMonth($scope.currentDate.getMonth() - 1);
+        } else {
+          $scope.currentDate.setDate($scope.currentDate.getDate() - 7);
+        }
+        $scope.updateCalendar();
+      };
+
+      $scope.next = function () {
+        if ($scope.viewMode === 'monthly') {
+          $scope.currentDate.setMonth($scope.currentDate.getMonth() + 1);
+        } else {
+          $scope.currentDate.setDate($scope.currentDate.getDate() + 7);
+        }
+        $scope.updateCalendar();
+      };
+
+      $scope.changeView = function (view) {
+        $scope.viewMode = view;
+        $scope.updateCalendar();
+      };
+      
+      // Select a Date to View Detailed Records
+      $scope.selectDate = function (day) {
+        $scope.selectedDate = day.date;
+        const selectedDateString = $filter('date')(day.date, 'yyyy-MM-dd');
+        const filteredRecords = $scope.records.filter(record => {
+          const recordDate = $filter('date')(new Date(record.paymentDate), 'yyyy-MM-dd');
+          return recordDate === selectedDateString;
+        });
+
+        // Calculate the payments for the selected date
+        if (filteredRecords.length > 0) {
+          const totalOnlinePayment = filteredRecords.reduce((sum, record) => sum + record.onlinePayment, 0);
+          const totalCashPayment = filteredRecords.reduce((sum, record) => sum + record.cashPayment, 0);
+          const totalPayment = totalOnlinePayment + totalCashPayment;
+
+          $scope.selectedDateData = {
+            onlinePayment: totalOnlinePayment,
+            cashPayment: totalCashPayment,
+            totalPayment: totalPayment
+          };
+        } else {
+          // If no records, show zero values
+          $scope.selectedDateData = {
+            onlinePayment: 0,
+            cashPayment: 0,
+            totalPayment: 0
+          };
+        }
+      };
+
+      // Close the modal
+      $scope.closeModal = function () {
+        $scope.selectedDate = null;
+        $scope.selectedDateData = {};
+      };
+
+      // Initial Fetch
+      $scope.fetchRecords();
+    });
+  </script>
+</body>
+</html>

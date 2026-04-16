@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
+	<link rel="icon" type="image/png" href="../assets/img/favicon.png">
+	<title>
+		Ashwini Medical
+	</title>
+	<!--     Fonts and icons     -->
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+	<!-- Nucleo Icons -->
+	<link href="https://demos.creative-tim.com/argon-dashboard-pro/assets/css/nucleo-icons.css" rel="stylesheet" />
+	<link href="https://demos.creative-tim.com/argon-dashboard-pro/assets/css/nucleo-svg.css" rel="stylesheet" />
+	<!-- Font Awesome Icons -->
+	<!-- <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>-->
+	<!-- CSS Files -->
+	<link id="pagestyle" href="../assets/css/argon-dashboard.css?v=2.1.0" rel="stylesheet" />
+</head>
+
+<body class="g-sidenav-show   bg-gray-100" ng-app="paymentApp" ng-controller="PaymentController"
+	ng-init="fetchallrecords()">
+	<div class="min-height-300 bg-dark position-absolute w-100"></div>
+	<aside
+		class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 "
+		id="sidenav-main">
+
+		<div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
+
+			<div id="sidebar-container">
+
+			</div>
+
+		</div>
+
+
+		</div>
+	</aside>
+	<main class="main-content position-relative border-radius-lg ">
+
+		<nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl " id="navbarBlur"
+			data-scroll="false">
+			<div class="container-fluid py-1 px-3">
+
+				<div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
+
+					<ul class="navbar-nav  justify-content-end">
+
+						<li class="nav-item d-xl-none ps-3 d-flex align-items-center">
+							<a href="javascript:;" class="nav-link text-white p-0" id="iconNavbarSidenav">
+								<div class="sidenav-toggler-inner">
+									<i class="sidenav-toggler-line bg-white"></i>
+									<i class="sidenav-toggler-line bg-white"></i>
+									<i class="sidenav-toggler-line bg-white"></i>
+								</div>
+							</a>
+						</li>
+
+					</ul>
+
+				</div>
+			</div>
+		</nav>
+		<script>
+			var win = navigator.platform.indexOf('Win') > -1;
+			if (win && document.querySelector('#sidenav-scrollbar')) {
+				var options = {
+					damping: '0.5'
+				}
+				Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+			}
+		</script>
+		<script>
+			fetch('sidebar.html')
+				.then(response => response.text())
+				.then(data => {
+					document.getElementById('sidebar-container').innerHTML = data;
+				});
+
+		</script>
+		<div class="container-fluid card m-2 py-4" style="background-color: #423b3b;">
+			<h3 class="txt-info" style=" color: white;">Collection Info</h3>
+			<div class="row">
+				<!-- Today's Collection -->
+				<div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+					<div class="card">
+						<div class="card-body p-3">
+							<div class="row">
+								<div class="col-8">
+									<div class="numbers">
+										<p class="text-sm mb-0 text-uppercase font-weight-bold">Today's</p>
+										<h5 class="font-weight-bolder" ng-mouseenter="showOriginal = true"
+											ng-mouseleave="showOriginal = false">
+											<span ng-if="showOriginal">{{ todayCollectionAmount | currency:'₹':2
+												}}</span>
+											<span ng-if="!showOriginal">{{ todayCollectionAmount | customCurrency
+												}}</span>
+										</h5>
+										</hr>
+										<h5 class="font-weight-bolder text-danger" ng-mouseenter="showOriginal = true"
+											ng-mouseleave="showOriginal = false">
+											<span ng-if="showOriginal">{{ todayPaidAmount | currency:'₹':2
+												}}</span>
+											<span ng-if="!showOriginal">{{ todayPaidAmount | customCurrency
+												}}</span>
+										</h5>
+									</div>
+								</div>
+								<div class="col-4 text-end">
+									<div
+										class="icon icon-shape bg-gradient-primary shadow-primary text-center rounded-circle">
+										<i class="ni ni-money-coins text-lg opacity-10" aria-hidden="true"></i>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Last Week Collection -->
+				<div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+					<div class="card">
+						<div class="card-body p-3">
+							<div class="row">
+								<div class="col-8">
+									<div class="numbers">
+										<p class="text-sm mb-0 text-uppercase font-weight-bold">Last Week</p>
+										<h5 class="font-weight-bolder" ng-mouseenter="showOriginal = true"
+											ng-mouseleave="showOriginal = false">
+											<span ng-if="showOriginal">{{ lastWeekCollectionAmount | currency:'₹':2
+												}}</span>
+											<span ng-if="!showOriginal">{{ lastWeekCollectionAmount | customCurrency
+												}}</span>
+										</h5>
+										</hr>
+										<h5 class="font-weight-bolder text-danger" ng-mouseenter="showOriginal = true"
+											ng-mouseleave="showOriginal = false">
+											<span ng-if="showOriginal">{{ lastWeekPaidAmount | currency:'₹':2
+												}}</span>
+											<span ng-if="!showOriginal">{{ lastWeekPaidAmount | customCurrency
+												}}</span>
+										</h5>
+									</div>
+								</div>
+								<div class="col-4 text-end">
+									<div
+										class="icon icon-shape bg-gradient-danger shadow-danger text-center rounded-circle">
+										<i class="ni ni-world text-lg opacity-10" aria-hidden="true"></i>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- This Month Collection -->
+				<div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+					<div class="card">
+						<div class="card-body p-3">
+							<div class="row">
+								<div class="col-8">
+									<div class="numbers">
+										<p class="text-sm mb-0 text-uppercase font-weight-bold">This Month</p>
+										<h5 class="font-weight-bolder" ng-mouseenter="showOriginal = true"
+											ng-mouseleave="showOriginal = false">
+											<span ng-if="showOriginal">{{ currentMonthCollectionAmount | currency:'₹':2
+												}}</span>
+											<span ng-if="!showOriginal">{{ currentMonthCollectionAmount | customCurrency
+												}}</span>
+										</h5>
+										</hr>
+										<h5 class="font-weight-bolder text-danger" ng-mouseenter="showOriginal = true"
+											ng-mouseleave="showOriginal = false">
+											<span ng-if="showOriginal">{{ currentMonthPaidAmount | currency:'₹':2
+												}}</span>
+											<span ng-if="!showOriginal">{{ currentMonthPaidAmount | customCurrency
+												}}</span>
+										</h5>
+									</div>
+								</div>
+								<div class="col-4 text-end">
+									<div
+										class="icon icon-shape bg-gradient-success shadow-success text-center rounded-circle">
+										<i class="ni ni-paper-diploma text-lg opacity-10" aria-hidden="true"></i>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Current Year Collection -->
+				<div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+					<div class="card">
+						<div class="card-body p-3">
+							<div class="row">
+								<div class="col-8">
+									<div class="numbers">
+										<p class="text-sm mb-0 text-uppercase font-weight-bold">Current Year</p>
+										<h5 class="font-weight-bolder" ng-mouseenter="showOriginal = true"
+											ng-mouseleave="showOriginal = false">
+											<span ng-if="showOriginal">{{ currentYearCollectionAmount | currency:'₹':2
+												}}</span>
+											<span ng-if="!showOriginal">{{ currentYearCollectionAmount | customCurrency
+												}}</span>
+										</h5>
+
+										</hr>
+										<h5 class="font-weight-bolder text-danger" ng-mouseenter="showOriginal = true"
+											ng-mouseleave="showOriginal = false">
+											<span ng-if="showOriginal">{{ currentYearPaidAmount | currency:'₹':2
+												}}</span>
+											<span ng-if="!showOriginal">{{ currentYearPaidAmount | customCurrency
+												}}</span>
+										</h5>
+									</div>
+								</div>
+								<div class="col-4 text-end">
+									<div
+										class="icon icon-shape bg-gradient-danger shadow-danger text-center rounded-circle">
+										<i class="ni ni-world text-lg opacity-10" aria-hidden="true"></i>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Highest Collection Info -->
+			<div class="col-xl-12 col-sm-6 mb-xl-0 mb-4">
+				<div class="card" style="background-color: #ceffee;">
+					<div class="card-body p-3">
+						<div class="row">
+							<div class="col-8">
+								<div class="numbers">
+									<p class="text-sm mb-0 text-uppercase font-weight-bold">Highest Collection Info</p>
+									<h5 class="font-weight-bolder" ng-mouseenter="showOriginal = true"
+										ng-mouseleave="showOriginal = false">
+										<span ng-if="showOriginal">{{ maxCollectionAmount | currency:'₹':2 }}</span>
+										<span ng-if="!showOriginal">{{ maxCollectionAmount | customCurrency }}</span>
+									</h5>
+								</div>
+							</div>
+							<div class="col-4 text-end">
+								<p class="text-sm mb-0 text-uppercase font-weight-bold">Date</p>
+								{{ maxCollectionDate }}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- TOTAL SPEND -->
+
+		<div class="container-fluid py-4">
+			<div class="row">
+				<div class="col-12">
+					<div class="card mb-4">
+						<div class="card-header pb-0">
+							<h6>All Collections</h6>
+						</div>
+						<div>
+							<label for="search">Search:</label>
+							<input type="text" id="search" ng-model="searchQuery" placeholder="Search payments..." />
+						</div>
+						<button class=" btn "
+							style="position: absolute;top: 36px;right: 26px;width: 120px;height: 60px;background-color: aquamarine;"
+							ng-click="addPayment()">Add New</button>
+						<div class="card-body px-0 pt-0 pb-2">
+							<div class="table-responsive p-0">
+								<table border="1" class="table align-items-center mb-0">
+									<thead>
+										<tr>
+											<th
+												class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+												ID</th>
+											<th
+												class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+												DATE</th>
+											<th
+												class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+												ONLINE</th>
+											<th
+												class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+												CASH </th>
+											<th
+												class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+												TOTAL </th>
+
+											<th class="text-secondary opacity-7">ACTION</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr ng-repeat="payment in getPaginatedRecords()">
+											<td>
+												<div class="d-flex px-2 py-1">
+													<div>
+
+													</div>
+													<div class="d-flex flex-column justify-content-center">
+														<h6 class="mb-0 text-sm">{{ payment.id }}</h6>
+
+
+													</div>
+												</div>
+											</td>
+											<td>
+												<p class="text-xs font-weight-bold mb-0">{{ payment.paymentDate }}</p>
+
+
+											</td>
+											<td class="align-middle text-center text-sm">
+												<p class="text-primary">{{ payment.onlinePayment }}</p>
+												<p class="text-danger">{{ payment.onlinePaymentpaid }}</p>
+
+											</td>
+											<td class="align-middle text-center">
+												<span class="text-secondary text-xs font-weight-bold">
+													<p class="text-primary"> {{ payment.cashPayment }}</p>
+													<p class="text-danger"> {{ payment.cashPaymentpaid }}</p>
+
+												</span>
+											</td>
+											<td class="align-middle text-center">
+												<span class="text-secondary text-xs font-weight-bold">
+													<p class="text-primary">{{payment.totalPayment }}</p>
+													<p class="text-danger">{{payment.totalPaymentpaid }}</p>
+
+												</span>
+											</td>
+											<td>
+												<a class="badge badge-sm bg-gradient-secondary"
+													ng-click="editPayment(payment)" aria-readonly="true">EDIT</a>
+												<a class="badge badge-sm bg-gradient-success"
+													ng-click="deletePayment(payment.id)">DELETE</a>
+											</td>
+										</tr>
+
+									</tbody>
+
+								</table>
+
+								<div>
+									<button ng-click="previousPage()" class="badge badge-sm bg-gradient-secondary"
+										ng-disabled="currentPage === 1">Previous</button>
+									<span>Page {{ currentPage }} of {{ totalPages() }}</span>
+									<button ng-click="nextPage()" class="badge badge-sm bg-gradient-secondary"
+										ng-disabled="currentPage === totalPages()">Next</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="modal" id="addPaymentModal" tabindex="-1" role="dialog" aria-labelledby="addPaymentModalLabel"
+				aria-hidden="true">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+
+						<div class="modal-header">
+							<h5 class="modal-title">Add New Payment</h5>
+							<button type="button" class="close" ng-click="closeaddModal()" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+
+						<div class="modal-body">
+							<form>
+
+								<div class="form-group">
+									<label for="paymentDate">Payment Date</label>
+									<input type="date" class="form-control" id="paymentDate"
+										ng-model="AddNewPayment.paymentDate"
+										ng-keydown="focusNext($event, 'onlinePayment')" />
+								</div>
+
+								<div class="row">
+									<div class="col-6">
+										<h6 class="text-primary">Collection</h6>
+
+										<div class="form-group">
+											<label for="onlinePayment">Online Payment</label>
+											<input type="number" class="form-control" id="onlinePayment"
+												ng-model="AddNewPayment.onlinePayment" ng-change="calculateTotal()"
+												ng-keydown="focusNext($event, 'cashPayment')" required
+												placeholder="Enter online payment due">
+										</div>
+
+										<div class="form-group">
+											<label for="cashPayment">Cash Payment</label>
+											<input type="number" class="form-control" id="cashPayment"
+												ng-model="AddNewPayment.cashPayment" ng-change="calculateTotal()"
+												ng-keydown="focusNext($event, 'onlinePaymentPaid')" required
+												placeholder="Enter cash payment due">
+										</div>
+
+										<div class="form-group">
+											<label for="totalPayment">Total Payment</label>
+											<input type="number" class="form-control" id="totalPayment"
+												ng-model="AddNewPayment.totalPayment" placeholder="Total " readonly>
+										</div>
+									</div>
+
+									<div class="col-6">
+										<h6 class="text-success">Payment Paid</h6>
+
+										<div class="form-group">
+											<label for="onlinePaymentPaid">Online Payment Paid</label>
+											<input type="number" class="form-control" id="onlinePaymentPaid"
+												ng-model="AddNewPayment.onlinePaymentpaid"
+												ng-change="calculatePaidTotal()"
+												ng-keydown="focusNext($event, 'cashPaymentPaid')" required
+												placeholder="Enter online payment paid">
+										</div>
+
+										<div class="form-group">
+											<label for="cashPaymentPaid">Cash Payment Paid</label>
+											<input type="number" class="form-control" id="cashPaymentPaid"
+												ng-model="AddNewPayment.cashPaymentpaid"
+												ng-change="calculatePaidTotal()"
+												ng-keydown="focusNext($event, 'submitBtn')" required
+												placeholder="Enter cash payment paid">
+										</div>
+
+										<div class="form-group">
+											<label for="totalPaymentPaid">Total Payment Paid</label>
+											<input type="number" class="form-control" id="totalPaymentPaid"
+												ng-model="AddNewPayment.totalPaymentpaid" readonly placeholder="Total ">
+										</div>
+									</div>
+								</div>
+
+								<div class="form-group text-right">
+									<button type="button" class="btn btn-success" id="submitBtn"
+										ng-click="submitPayment()">Submit Payment</button>
+								</div>
+
+							</form>
+
+							<div class="text-danger" ng-if="errorMessage">{{ errorMessage }}</div>
+							<div class="text-success" ng-if="successMessage">{{ successMessage }}</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+
+			<!---model for add -->
+
+			<!-- Edit Payment Modal -->
+			<div class="modal" id="editPaymentModal" tabindex="-1" role="dialog" aria-labelledby="editPaymentModalLabel"
+				aria-hidden="true">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+
+						<div class="modal-header">
+							<h5 class="modal-title">Edit </h5>
+							<button type="button" class="close" ng-click="closeEditModal()" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+
+						<div class="modal-body">
+							<form>
+
+
+								<div class="form-group">
+									<label for="editPaymentId">Payment ID</label>
+									<input type="text" class="form-control" id="editPaymentId"
+										ng-model="selectedPayment.id" readonly>
+								</div>
+
+								<div class="row">
+									<div class="col-6">
+
+										<h6 class="text-primary">Collection</h6>
+
+										<div class="form-group">
+											<label for="editOnlinePayment">Online Payment</label>
+											<input type="number" class="form-control" id="editOnlinePayment"
+												ng-model="selectedPayment.onlinePayment" required>
+										</div>
+
+										<div class="form-group">
+											<label for="editCashPayment">Cash Payment</label>
+											<input type="number" class="form-control" id="editCashPayment"
+												ng-model="selectedPayment.cashPayment" required>
+										</div>
+
+										<div class="form-group">
+											<label for="editTotalPayment">Total Payment</label>
+											<input type="number" class="form-control" id="editTotalPayment"
+												ng-model="selectedPayment.totalPayment">
+										</div>
+
+									</div>
+									<div class="col-6">
+
+										<h6 class="text-success">Payment Paid</h6>
+
+										<div class="form-group">
+											<label for="editOnlinePaymentPaid">Online Payment Paid</label>
+											<input type="number" class="form-control" id="editOnlinePaymentPaid"
+												ng-model="selectedPayment.onlinePaymentpaid"
+												ng-change="calculatePaidTotal()" required>
+										</div>
+
+										<div class="form-group">
+											<label for="editCashPaymentPaid">Cash Payment Paid</label>
+											<input type="number" class="form-control" id="editCashPaymentPaid"
+												ng-model="selectedPayment.cashPaymentpaid"
+												ng-change="calculatePaidTotal()" required>
+										</div>
+
+										<div class="form-group">
+											<label for="editTotalPaymentPaid">Total Payment Paid</label>
+											<input type="number" class="form-control" id="editTotalPaymentPaid"
+												ng-model="selectedPayment.totalPaymentpaid">
+										</div>
+
+									</div>
+
+								</div>
+
+
+								<div class="form-group text-right">
+									<button type="button" class="btn btn-primary" ng-click="updatePayment()">Update
+										Payment</button>
+								</div>
+
+							</form>
+						</div>
+
+					</div>
+				</div>
+			</div>
+
+
+		</div>
+		<footer class="footer pt-3  ">
+
+		</footer>
+		</div>
+	</main>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+	<!-- Load AngularJS first -->
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="../assets/js/core/popper.min.js"></script>
+	<script src="../assets/js/core/bootstrap.min.js"></script>
+	<script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
+	<script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
+
+	<script async defer src="https://buttons.github.io/buttons.js"></script>
+
+	<script src="../assets/js/argon-dashboard.min.js?v=2.1.0"></script>
+	<script src="../assets/js/config.js"></script>
+
+	<script>
+
+
+		angular.module('paymentApp', []).filter('customCurrency', function () {
+			return function (input) {
+				if (input >= 100000) {
+					// Convert the value to Lac and format it
+					return (input / 100000).toFixed(2) + ' Lac';
+				} else {
+					// Default currency format for values less than 1 Lac
+					return '₹ ' + input.toFixed(2);
+				}
+			};
+		})
+			.controller('PaymentController', ['$scope', '$http', function ($scope, $http) {
+				$scope.payments = [];
+				$scope.newPayment = {};
+				$scope.editMode = false;
+				$scope.addMode = false;
+				$scope.currentPayment = {};
+
+				$scope.currentPage = 1; // Initialize the current page
+				$scope.recordsPerPage = 7; // Number of records per page
+				$scope.searchQuery = ""; // Search input model
+
+				// Calculate the total number of pages based on the filtered data
+				$scope.totalPages = function () {
+					const filteredRecords = $scope.filteredPayments();
+					return Math.ceil(filteredRecords.length / $scope.recordsPerPage);
+				};
+
+				// Get the filtered and sorted records
+				$scope.filteredPayments = function () {
+					return $scope.payments
+						.filter(payment => {
+							// Filter based on search query (case-insensitive)
+							const query = $scope.searchQuery.toLowerCase();
+							return Object.values(payment).some(value =>
+								value.toString().toLowerCase().includes(query)
+							);
+						})
+						.sort((a, b) => new Date(a.paymentDate) - new Date(b.paymentDate)); // Sort by date (ascending)
+				};
+
+				$scope.getPaginatedRecords = function () {
+					const sortedPayments = $scope.filteredPayments().sort(function (a, b) {
+						return new Date(b.paymentDate) - new Date(a.paymentDate); // Descending: latest first
+					});
+
+					const startIndex = ($scope.currentPage - 1) * $scope.recordsPerPage;
+					const endIndex = startIndex + $scope.recordsPerPage;
+
+					return sortedPayments.slice(startIndex, endIndex);
+				};
+
+				// Navigate to the next page
+				$scope.nextPage = function () {
+					if ($scope.currentPage < $scope.totalPages()) {
+						$scope.currentPage++;
+					}
+				};
+
+
+				// Navigate to the previous page
+				$scope.previousPage = function () {
+					if ($scope.currentPage > 1) {
+						$scope.currentPage--;
+					}
+				};
+
+				// Fetch data from the API
+				$scope.fetchPayments = function () {
+					$http.get('/api/payments')
+						.then(function (response) {
+							$scope.payments = response.data;
+
+							const collectionData = response.data;
+							const today = new Date();
+
+							// Initialize collection statistics
+							$scope.totalCollectionAmount = 0;
+							$scope.todayCollectionAmount = 0;
+							$scope.lastWeekCollectionAmount = 0;
+							$scope.currentMonthCollectionAmount = 0;
+							$scope.currentYearCollectionAmount = 0;
+							$scope.lastYearCollectionAmount = 0;
+							$scope.totalPaidAmount = 0;
+							$scope.todayPaidAmount = 0;
+							$scope.lastWeekPaidAmount = 0;
+							$scope.currentMonthPaidAmount = 0;
+							$scope.currentYearPaidAmount = 0;
+							$scope.lastYearPaidAmount = 0;
+
+							let highestCollectionAmount = 0;
+							let highestCollectionDate = '';
+
+							// Calculate collection statistics
+							collectionData.forEach(function (collection) {
+								const collectionDate = new Date(collection.paymentDate);
+								const totalPayment = collection.totalPayment || 0; // Default to 0 if null
+								const totalXPayment = collection.totalPaymentpaid || 0; // Default to 0 if null
+
+								// Total collection amount
+								$scope.totalCollectionAmount += totalPayment;
+								$scope.totalPaidAmount += totalXPayment;
+								// Today's collection
+								if (
+									collectionDate.toISOString().slice(0, 10) ===
+									today.toISOString().slice(0, 10)
+								) {
+									$scope.todayCollectionAmount += totalPayment;
+									$scope.todayPaidAmount += totalXPayment;
+								}
+
+								// Last week's collection
+								const lastWeekStart = new Date(today);
+								lastWeekStart.setDate(today.getDate() - 7);
+								if (collectionDate >= lastWeekStart && collectionDate < today) {
+									$scope.lastWeekCollectionAmount += totalPayment;
+									$scope.lastWeekPaidAmount += totalXPayment;
+								}
+
+								// Current month's collection
+								const firstDayOfCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+								const lastDayOfCurrentMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+								if (collectionDate >= firstDayOfCurrentMonth && collectionDate <= lastDayOfCurrentMonth) {
+									$scope.currentMonthCollectionAmount += totalPayment;
+									$scope.currentMonthPaidAmount += totalXPayment;
+								}
+
+								// Current year's collection
+								const startOfCurrentYear = new Date(today.getFullYear(), 0, 1);
+								const endOfCurrentYear = new Date(today.getFullYear(), 11, 31);
+								if (collectionDate >= startOfCurrentYear && collectionDate <= endOfCurrentYear) {
+									$scope.currentYearPaidAmount += totalXPayment;
+									$scope.currentYearCollectionAmount += totalPayment;
+								}
+
+								// Last year's collection
+								const startOfLastYear = new Date(today.getFullYear() - 1, 0, 1);
+								const endOfLastYear = new Date(today.getFullYear() - 1, 11, 31);
+								if (collectionDate >= startOfLastYear && collectionDate <= endOfLastYear) {
+									$scope.lastYearPaidAmount += totalXPayment;
+									$scope.lastYearCollectionAmount += totalPayment;
+								}
+
+								// Track highest collection
+								if (totalPayment > highestCollectionAmount) {
+									highestCollectionAmount = totalPayment;
+									highestCollectionDate = collection.paymentDate;
+								}
+							});
+
+							// Store highest collection data
+							$scope.maxCollectionAmount = highestCollectionAmount;
+							$scope.maxCollectionDate = highestCollectionDate;
+
+						})
+						.catch(function (error) {
+							console.error('Error fetching collection data:', error);
+						});
+				};
+
+				$scope.deletePayment = function (id) {
+					$http.delete('/api/payments/' + id)
+						.then(function (response) {
+							if (typeof response.data.message === 'string') {
+								alert(response.data.message); // Show the message if it's a string
+							} else {
+								alert('Unexpected response format: ' + JSON.stringify(response.data));
+							}// Refresh the table
+						}, function (error) {
+							// Handle error response
+							console.error('Error response:', error);
+							alert('Error deleting payment: ' + (error.data.error || error.statusText || 'Unknown error'));
+						});
+				};
+
+				// Prepare to edit a payment
+				// This should be populated with your payment data
+				$scope.selectedPayment = {}; // This will hold the payment data to be edited
+				$scope.errorMessage = '';
+				$scope.successMessage = '';
+
+				// Function to open the edit modal
+				$scope.editPayment = function (payment) {
+					$scope.selectedPayment = angular.copy(payment); // Copy the payment data to selectedPayment
+					$('#editPaymentModal').modal('show'); // Show the modal (assuming you're using Bootstrap)
+				};
+
+				// Function to close the edit modal
+				$scope.closeEditModal = function () {
+					$('#editPaymentModal').modal('hide'); // Hide the modal
+				};
+
+				$scope.addPayment = function () {
+					// Copy the payment data to selectedPayment
+					$('#addPaymentModal').modal('show'); // Show the modal (assuming you're using Bootstrap)
+				};
+
+				// Function to close the edit modal
+				$scope.closeaddModal = function () {
+					$('#addPaymentModal').modal('hide'); // Hide the modal
+				};
+
+				// Function to update the payment
+				$scope.updatePayment = function () {
+
+					$http.put('/api/payments/' + $scope.selectedPayment.id, $scope.selectedPayment)
+						.then(function (response) {
+							$scope.successMessage = 'Payment updated successfully!';
+							alert("Payment updated successfully!");
+							$scope.errorMessage = '';
+							$scope.closeEditModal(); // Close the modal
+							// Optionally refresh the payments list
+							$scope.fetchPayments(); // Implement this function to refresh the list
+						}, function (error) {
+							alert('Error updating payment: ' + (error.data || 'An error occurred while communicating with the server.'));
+							$scope.errorMessage = 'Error updating payment: ' + (error.data || 'An error occurred while communicating with the server.');
+						});
+				};
+
+				// Update a payment
+				$scope.updatePayment2 = function () {
+					$http.put('/api/payments/' + $scope.currentPayment.id, $scope.currentPayment)
+						.then(function (response) {
+							alert(response.data);
+							$scope.fetchPayments(); // Refresh the table
+							$scope.editMode = false; // Exit edit mode
+							$scope.currentPayment = {}; // Reset the form
+						}, function (error) {
+							alert('Error updating payment: ' + error.data);
+						});
+				};
+
+				// Cancel edit mode
+				$scope.cancelEdit = function () {
+					$scope.editMode = false;
+					$scope.addMode = false;
+					$scope.currentPayment = {};
+				};
+				$scope.calculateTotal = function () {
+					// Parse the values to ensure they are numbers
+					const onlinePayment = parseFloat($scope.selectedPayment.onlinePayment) || 0;
+					const cashPayment = parseFloat($scope.selectedPayment.cashPayment) || 0;
+					// Calculate total
+					$scope.selectedPayment.totalPayment = onlinePayment + cashPayment;
+				};
+				$scope.calculatePaidTotal = function () {
+					if ($scope.AddNewPayment) {
+						$scope.AddNewPayment.totalPaymentpaid =
+							($scope.AddNewPayment.onlinePaymentpaid || 0) +
+							($scope.AddNewPayment.cashPaymentpaid || 0);
+					}
+
+				}
+				function generateUniquePaymentId() {
+					const now = new Date();
+					return now.getFullYear().toString() +
+						(now.getMonth() + 1).toString().padStart(2, '0') +
+						now.getDate().toString().padStart(2, '0') +
+						now.getHours().toString().padStart(2, '0') +
+						now.getMinutes().toString().padStart(2, '0');
+				}
+
+				// Initialize models
+				$scope.AddNewPayment = {
+					// Generate a default unique payment ID
+					paymentDate: new Date().toISOString().split('T')[0], // Default to today's date
+
+				};
+
+				// Reset messages
+				$scope.errorMessage = '';
+				$scope.successMessage = '';
+
+				// Calculate total payment
+				$scope.calculateTotal = function () {
+					const onlinePayment = parseFloat($scope.AddNewPayment.onlinePayment) || 0;
+					const cashPayment = parseFloat($scope.AddNewPayment.cashPayment) || 0;
+					$scope.AddNewPayment.totalPayment = onlinePayment + cashPayment;
+				};
+
+				// Submit payment function
+				$scope.submitPayment = function () {
+					// Reset messages
+					$scope.errorMessage = '';
+					$scope.successMessage = '';
+
+					// Make sure paymentDate is in the correct format, e.g., "2024-11-22"
+					const selectedDate = new Date($scope.AddNewPayment.paymentDate);
+
+					// Ensure that the selected date is valid
+					if (isNaN(selectedDate)) {
+						console.error("Invalid date format:", $scope.AddNewPayment.paymentDate);
+					} else {
+						// Extract year, month, and day using local time
+						const year = selectedDate.getFullYear();
+						const month = (selectedDate.getMonth() + 1).toString().padStart(2, '0');  // +1 because getMonth() is zero-indexed
+						const day = selectedDate.getDate().toString().padStart(2, '0');
+
+						// Set the formatted date to the scope model
+						$scope.AddNewPayment.paymentDate = `${year}-${month}-${day}`;
+
+						console.log("Selected Date:", $scope.AddNewPayment.paymentDate); // This should print the correct date in "YYYY-MM-DD" format
+					}
+					//	  $scope.AddNewPayment.paymentDate = new Date().toLocaleDateString('en-CA');
+
+					// console.log("2>>"+ $scope.AddNewPayment.paymentDate.toLocaleDateString('en-CA'));
+					// Validate inputs
+					if ($scope.AddNewPayment.onlinePayment < 0 || $scope.AddNewPayment.cashPayment < 0) {
+						$scope.errorMessage = 'Payment amounts must be non-negative.';
+						return;
+					}
+					if (!$scope.AddNewPayment.totalPayment || $scope.AddNewPayment.totalPayment <= 0) {
+						$scope.errorMessage = 'Total payment must be greater than 0.';
+						return;
+					}
+					if (!$scope.AddNewPayment.paymentDate) {
+						$scope.errorMessage = 'Payment date is required.';
+						return;
+					}
+
+					$http.post('/api/payments', $scope.AddNewPayment)
+						.then(function (response) {
+							const message = response.data.message || 'Payment added successfully!';
+							alert(message); // Show success alert
+
+							$scope.fetchPayments();
+
+							$scope.AddNewPayment = {
+								// paymentId: generateUniquePaymentId(),
+								paymentDate: new Date().toISOString().split('T')[0],
+								// onlinePayment: 0,
+								//cashPayment: 0,
+								// totalPayment: 0
+
+							};
+							setTimeout(function () {
+								document.getElementById('paymentDate').focus();
+							}, 0);
+
+						}, function (error) {
+							const errorMessage = error.data?.message || 'An error occurred while communicating with the server.';
+							alert('Error: ' + errorMessage);
+						});
+
+				};
+
+				document.addEventListener('keydown', function (e) {
+					if (e.ctrlKey && e.key.toLowerCase() === 'a') {
+						e.preventDefault(); // Prevent browser's new tab action
+
+						const modalElement = document.getElementById('addPaymentModal');
+						const modal = new bootstrap.Modal(modalElement);
+						modal.show();
+					}
+				});
+				$scope.focusNext = function (event, nextElementId) {
+					if (event.key === 'Enter') {
+						event.preventDefault(); // Prevent form submission
+						const next = document.getElementById(nextElementId);
+						if (next) {
+							next.focus();
+						}
+					}
+				};
+
+
+				$scope.totalCollectionAmount = 0;
+				$scope.todayCollectionAmount = 0;
+				$scope.lastWeekCollectionAmount = 0;
+				$scope.currentMonthCollectionAmount = 0;
+				$scope.currentYearCollectionAmount = 0;
+				$scope.lastYearCollectionAmount = 0;
+				// Fetch collection data
+				$scope.fetchPayments();
+			}]);
+
+	</script>
+
+
+</body>
+
+</html>

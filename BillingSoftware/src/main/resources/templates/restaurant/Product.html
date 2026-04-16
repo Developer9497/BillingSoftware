@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html ng-app="productApp">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Product Master</title>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+
+	<style>
+		/* KEEPING YOUR SAME DESIGN */
+		body {
+			font-family: Arial;
+			background: #dcdcdc;
+		}
+
+		.container {
+			width: 1000px;
+			margin: 20px auto;
+			background: #e6e6e6;
+			border: 2px solid #999;
+			padding: 10px;
+		}
+
+		.row {
+			display: flex;
+			align-items: center;
+			margin-bottom: 6px;
+		}
+
+		.label {
+			width: 140px;
+			font-weight: bold;
+		}
+
+		input,
+		select {
+			height: 22px;
+			border: 1px solid #999;
+			background: #f5f5f5;
+			padding: 2px 4px;
+		}
+
+		input:focus {
+			outline: none;
+			border-color: blue;
+		}
+
+		.tabs {
+			display: flex;
+			border-bottom: 1px solid #999;
+			margin-top: 10px;
+		}
+
+		.tab {
+			padding: 5px 12px;
+			border: 1px solid #999;
+			border-bottom: none;
+			background: #ddd;
+			cursor: pointer;
+		}
+
+		.tab.active {
+			background: #fff;
+			font-weight: bold;
+		}
+
+		.box {
+			border: 1px solid #999;
+			padding: 10px;
+			background: #fff;
+		}
+
+		.right-panel {
+			width: 220px;
+			border: 1px solid #999;
+			padding: 10px;
+			background: #eee;
+		}
+
+		.image-box {
+			height: 150px;
+			border: 1px solid #999;
+			margin-bottom: 10px;
+			background: #fff url('https://cdn-icons-png.flaticon.com/512/2965/2965567.png') center/contain no-repeat;
+		}
+
+		.btn {
+			padding: 4px 10px;
+			border: 1px solid #888;
+			background: #ddd;
+			cursor: pointer;
+			margin-right: 5px;
+		}
+
+		.btn:hover {
+			background: #ccc;
+		}
+
+		.footer {
+			margin-top: 10px;
+			text-align: center;
+		}
+
+		.small-box {
+			border: 1px solid #999;
+			padding: 10px;
+			margin-top: 10px;
+			background: #f5f5f5;
+			font-size: 12px;
+		}
+
+		.green {
+			color: green;
+		}
+
+		.red {
+			color: red;
+		}
+		.suggestions {
+		    position: absolute;
+		    top: 24px;            /* just below input */
+		    left: 0;
+		    width: 100%;
+		    background: #fff;
+		    border: 1px solid #999;
+		    z-index: 1000;
+		    max-height: 200px;
+		    overflow-y: auto;
+		    box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
+		}
+
+		.list-item {
+		    padding: 6px;
+		    cursor: pointer;
+		    border-bottom: 1px solid #eee;
+		}
+
+		.list-item:hover {
+		    background: #f0f0f0;
+		}
+
+		.highlighted {
+		    background: #007bff;
+		    color: #fff;
+		}
+	</style>
+</head>
+
+<body ng-controller="ProductController">
+
+	<div class="container">
+		
+		<!-- TOP -->
+		<div class="row">
+			
+			<div class="row" style="position:relative;">
+			    
+			    <div class="label">Product Name :</div>
+
+			    <div style="position:relative; width:300px;">
+			        <input id="newprod"
+			               style="width:100%;"
+			               ng-model="formData.name"
+			               autocomplete="off"
+			               ng-change="searchProduct(formData.name)"
+			               ng-keydown="onSuggestionKeyDown($event,
+			               productSuggestions,
+			               'productHighlightIndex',
+			               'selectProduct')"
+			               placeholder="Type product name..." autofocus-input />
+
+			        <!-- Suggestions -->
+			        <div class="suggestions" ng-if="productSuggestions.length">
+			            <div class="list-group">
+			                <div class="list-item"
+			                     ng-repeat="p in productSuggestions track by $index"
+			                     ng-click="selectProduct(p)"
+			                     ng-class="{'highlighted': $index === productHighlightIndex}">
+			                     
+			                    <b>{{p.name}}
+			                </div>
+			            </div>
+			        </div>
+			    </div>
+
+			</div>
+<!--			<div class="label">Product Name :</div>-->
+
+<!--			<input style="width:300px"-->
+<!--			       ng-model="formData.name"-->
+<!--			       ng-change="searchProduct(formData.name)"-->
+<!--			       autocomplete="off">-->
+
+<!--			 Suggestions -->
+<!--			<div ng-show="productSuggestions.length"-->
+<!--			     style="position:absolute; top:25px; left:140px; width:300px;-->
+<!--			            background:#fff; border:1px solid #999; z-index:10; max-height:150px; overflow:auto;">-->
+
+<!--			    <div ng-repeat="p in productSuggestions"-->
+<!--			         ng-click="selectProduct(p)"-->
+<!--			         style="padding:5px; cursor:pointer;"-->
+<!--			         onmouseover="this.style.background='#eee'"-->
+<!--			         onmouseout="this.style.background='#fff'">-->
+
+<!--					 <b>{{p.name}}</b> — {{p.packing}} — {{p.company}}-->
+<!--			    </div>-->
+<!--			</div>-->
+		</div>
+
+		<div class="row">
+			<div class="label">Short Code :</div>
+			<input style="width:200px" ng-model="formData.shortCode">
+		</div>
+
+		<div class="row">
+			<div class="label">Contents :</div>
+			<input style="width:200px" ng-model="formData.contents">
+			<button class="btn">+</button>
+		</div>
+
+		<!-- MAIN -->
+		<div style="display:flex; gap:10px;">
+
+			<!-- LEFT -->
+			<div style="flex:1;">
+
+				<div class="tabs">
+					<div class="tab active">General</div>
+<!--					<div class="tab">Local</div>-->
+<!--					<div class="tab">Suppliers</div>-->
+				</div>
+
+				<div class="box">
+
+					<div class="row">
+						<div class="label">Company Name :</div>
+						<input style="width:250px" ng-model="formData.companyName">
+					</div>
+
+					<div class="row">
+						<div class="label">Short Name :</div>
+						<input style="width:150px" ng-model="formData.shortName">
+					</div>
+
+					<div class="row">
+						<div class="label">Manufacturer :</div>
+						<input style="width:250px" ng-model="formData.manufacturer">
+					</div>
+
+					
+
+					               <div class="row">
+					                   <div class="label">Category :</div>
+					                   <select style="width:150px"
+					                       ng-model="formData.category"
+					                       ng-options="c.category as c.category for c in categories">
+					                   </select>
+					                   <button class="btn" ng-click="addCategory()">+</button>
+
+					                   <div class="label" style="width:80px">Form :</div>
+					                   <select style="width:120px"
+					                       ng-model="formData.form"
+					                       ng-options="f.form as f.form for f in forms">
+					                   </select>
+					                   <button class="btn" ng-click="addForm()">+</button>
+					               </div>
+
+					               <div class="row">
+					                   <div class="label">Packing :</div>
+					                   <select style="width:120px"
+					                       ng-model="formData.packing"
+					                       ng-options="p.packing as p.packing for p in packings">
+					                   </select>
+					                   <button class="btn" ng-click="addPacking()">+</button>
+
+					                   <div class="label" style="width:80px">Unit Type :</div>
+					                   <select style="width:80px"
+					                       ng-model="formData.unitType"
+					                       ng-options="u.unitType as u.unitType for u in unitTypes">
+					                   </select>
+					                   <button class="btn" ng-click="addUnitType()">+</button>
+									   <div class="label" style="width:80px">Unit Q :</div> <input  type="number" style="width:50px" ng-model="formData.unitQty"> </div>
+					             
+
+					          
+					<div class="row">
+						<div class="label">Min. Level :</div>
+						<input style="width:60px" type="number" ng-model="formData.minLevel">
+
+						<div class="label" style="width:100px">Max. Level :</div>
+						<input style="width:60px" type="number" ng-model="formData.maxLevel">
+					</div>
+
+					<div class="row">
+						<div class="label">Cash Disc :</div>
+						<input style="width:40px" type="number" ng-model="formData.cashDiscount">
+
+						<div class="label" style="width:100px">Discount % :</div>
+						<input style="width:70px" type="number" ng-model="formData.discountPercent">
+					</div>
+
+					<div class="row">
+						<div class="label">GST % :</div>
+						<input style="width:60px" type="number" ng-model="formData.gstPercent">
+						<button class="btn">+</button>
+
+						<div class="label" style="width:100px">GST On :</div>
+						<input style="width:150px" type="number" ng-model="formData.gstOn">
+					</div>
+
+					<div class="row">
+						<div class="label">CESS :</div>
+						<input style="width:60px" ng-model="formData.cess">
+
+						<div class="label" style="width:100px">Bill Status :</div>
+						<input style="width:40px" ng-model="formData.billStatus">
+					</div>
+
+					<div class="row">
+						<div class="label">HSN Code :</div>
+						<input style="width:80px" ng-model="formData.hsnCode">
+
+						<div class="label" style="width:140px; background:#f4c27c;">Loose Sale :</div>
+						<input style="width:40px" ng-model="formData.looseSale">
+						<div class="label">Barcode :</div>
+																	<input style="width:140px" ng-model="formData.barcode">
+
+										
+					</div>
+					</div>
+					
+			</div>
+
+			<!-- RIGHT -->
+			<div class="right-panel">
+				<div class="image-box"></div>
+
+				<button class="btn" style="width:100%">Start Camera</button>
+				<button class="btn" style="width:100%; margin-top:5px;">...</button>
+
+				<div class="small-box">
+					<div class="red">Ctrl+S :</div>
+					<div class="green">Suppliers Tab</div><br>
+					<div class="red">Ctrl+G :</div>
+					<div class="green">General Tab</div><br>
+				</div>
+			</div>
+
+		</div>
+
+		<!-- FOOTER -->
+		<div class="footer">
+			<button class="btn" ng-click="resetForm()">New</button>
+
+			<button class="btn" ng-show="!isUpdateMode" ng-click="saveProduct()">Save</button>
+
+			<button class="btn" ng-show="isUpdateMode" ng-click="updateProduct()">Update</button>
+
+			<button class="btn" ng-click="deleteProduct(formData.id)">Delete</button>
+
+			<button class="btn" ng-click="dublicatProduct(formData)">Dublicate</button>
+		</div>
+
+		<!-- PRODUCT LIST -->
+
+
+	</div>
+
+	<script>
+		var app = angular.module("productApp", []);
+		app.directive('autofocusInput', function ($timeout) {
+		    return {
+		        restrict: 'A',
+		        link: function (scope, element) {
+
+		            // Focus on load
+		            $timeout(function () {
+		                element[0].focus();
+		            }, 100);
+
+		            // Focus after reset
+		            scope.$watch('formData', function () {
+		                $timeout(function () {
+		                    element[0].focus();
+		                }, 100);
+		            }, true);
+		        }
+		    };
+		});
+
+		//app.controller("ProductController", function ($scope, $http) {
+			app.controller('ProductController', ['$scope', '$timeout', '$http', function ($scope, $timeout, $http) {
+
+			const API = "/api/product";
+			    const MASTER_API = "http://localhost:8080/api/master";
+
+			    $scope.formData = {};
+				$scope.loadingProduct = true;
+				
+				$scope.onSuggestionKeyDown = function(event, list, indexVar, selectFnName) {
+
+				    if (!list || !list.length) return;
+
+				    if (event.key === "ArrowDown") {
+				        event.preventDefault();
+				        $scope[indexVar] = ($scope[indexVar] + 1) % list.length;
+				    }
+
+				    else if (event.key === "ArrowUp") {
+				        event.preventDefault();
+				        $scope[indexVar] = ($scope[indexVar] > 0)
+				            ? $scope[indexVar] - 1
+				            : list.length - 1;
+				    }
+
+				    else if (event.key === "Enter") {
+				        event.preventDefault();
+
+				        if ($scope[indexVar] >= 0) {
+				            let selected = list[$scope[indexVar]];
+				            $scope[selectFnName](selected);
+				        }
+				    }
+
+				    else if (event.key === "Escape") {
+				        $scope.productSuggestions = [];
+				        $scope.productHighlightIndex = -1;
+				    }
+				};
+
+			    // ================= LOAD MASTER =================
+			    $scope.loadMasters = function() {
+			        $http.get("/api/dropdown/category").then(res => $scope.categories = res.data);
+			        $http.get("/api/dropdown/form").then(res => $scope.forms = res.data);
+			        $http.get("/api/dropdown/packing").then(res => $scope.packings = res.data);
+			        $http.get("/api/dropdown/unit").then(res => $scope.unitTypes = res.data);
+			    };
+
+			    // ================= ADD =================
+			    $scope.addCategory = function() {
+			        let val = prompt("Enter Category");
+					console.log(val);
+			        if(!val) return;
+
+			        $http.post("/api/dropdown/category", { category: val })
+			        .then(res => {
+			            $scope.loadMasters();
+			            $scope.formData.category = res.data;
+			        });
+			    };
+
+			    $scope.addForm = function() {
+			        let val = prompt("Enter Form");
+					console.log(val);
+			        if(!val) return;
+
+			        $http.post("/api/dropdown/form", { form: val })
+			        .then(res => {
+			            $scope.loadMasters();
+			            $scope.formData.form = res.data;
+			        });
+			    };
+
+			    $scope.addPacking = function() {
+			        let val = prompt("Enter Packing");
+					console.log(val);
+			        if(!val) return;
+
+			        $http.post("/api/dropdown/packing", { packing: val })
+			        .then(res => {
+			            $scope.loadMasters();
+			            $scope.formData.packing = res.data;
+			        });
+			    };
+
+			    $scope.addUnitType = function() {
+			        let val = prompt("Enter Unit Type");
+					console.log(val);
+			        if(!val) return;
+
+			        $http.post("/api/dropdown/unit", { unitType: val })
+			        .then(res => {
+			            $scope.loadMasters();
+			            $scope.formData.unitType = res.data;
+			        });
+			    };
+
+			    // ================= PRODUCT =================
+			    $scope.saveProduct = function() {
+					console.log($scope.formData);
+			        $http.post(API, $scope.formData).then(() => {
+			            alert("Saved");
+			        });
+			    };
+
+			    $scope.loadProducts = function() {
+			        $http.get(API).then(res => {
+			            $scope.products = res.data;
+			        });
+			    };
+
+			    // INIT
+			    $scope.loadMasters();
+			    $scope.loadProducts();
+			$scope.products = [];
+			$scope.formData = {};
+			$scope.isUpdateMode = false;
+
+			$scope.loadProducts = function () {
+				$http.get(API).then(res => {
+					$scope.products = res.data;
+				});
+			};
+			let productTimer = null;
+
+			$scope.productSuggestions = [];
+
+			// SEARCH PRODUCT (same like your party search)
+			$scope.searchProduct = function (q) {
+
+			    if (productTimer) $timeout.cancel(productTimer);
+			    $scope.productSuggestions = [];
+
+			    if (!q || q.length < 2) return;
+
+			    productTimer = $timeout(function () {
+
+			        $http.get('/api/product/search?name=' + encodeURIComponent(q))
+			            .then(function (resp) {
+			                $scope.productSuggestions = resp.data || [];
+			            })
+			            .catch(function (err) {
+			                console.error('Product search error', err);
+			                $scope.productSuggestions = [];
+			            });
+
+			    }, 150);
+			};
+			$scope.productHighlightIndex = -1;
+			$scope.selectProduct = function(p) {
+
+			    // ✅ Fill entire form
+			    $scope.formData = angular.copy(p);
+
+			    // OR if you only want name:
+			    // $scope.formData.name = p.name;
+
+			    // Clear suggestions
+			    $scope.productSuggestions = [];
+			    $scope.productHighlightIndex = -1;
+			};
+			$scope.saveProduct = function () {
+				$http.post(API, $scope.formData).then(() => {
+					alert("Saved");
+					$scope.loadProducts();
+					$scope.resetForm();
+				});
+			};
+
+			$scope.editProduct = function (p) {
+				$scope.formData = angular.copy(p);
+				$scope.isUpdateMode = true;
+			};
+			$scope.dublicatProduct = function (p) {
+							$scope.formData = angular.copy(p);
+							delete $scope.formData.id;
+							console.log($scope.formData);
+							alert("Dublicate product "+ $scope.formData.name);
+							$scope.isUpdateMode = false;
+						};
+
+			
+			$scope.updateProduct = function () {
+				$http.put(API + "/" + $scope.formData.id, $scope.formData)
+					.then(() => {
+						alert("Updated");
+						$scope.loadProducts();
+						$scope.resetForm();
+					});
+			};
+
+			$scope.deleteProduct = function (id) {
+				if (!id) return;
+				if (confirm("Delete?")) {
+					$http.delete(API + "/" + id).then(() => {
+						alert("Deleted");
+						$scope.loadProducts();
+						$scope.resetForm();
+					});
+				}
+			};
+
+			$scope.resetForm = function () {
+				$scope.formData = {};
+				$scope.isUpdateMode = false;
+			};
+
+			$scope.loadProducts();
+			}]);
+	</script>
+
+</body>
+
+</html>

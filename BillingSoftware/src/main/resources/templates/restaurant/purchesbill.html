@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="utf-8" />
+      <title>Purchase Bill</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <!-- Bootstrap 5 CSS -->
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+      <!-- AngularJS -->
+      <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+      <style>
+		
+		/* ===== GLOBAL ===== */
+		body {
+		    font-family: "Segoe UI", Arial, sans-serif;
+		    background: #f1f3f6;
+		}
+
+		/* ===== MAIN CONTAINER ===== */
+		.container {
+		    width: 95%;
+		    max-width: 1200px;
+		    margin: 20px auto;
+		    background: #ffffff;
+		    border-radius: 8px;
+		    border: 1px solid #ddd;
+		    padding: 12px;
+		    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+		}
+
+		/* ===== ROW FIX ===== */
+		.row {
+		    display: flex;
+		    margin-bottom: 6px;
+		    align-items: center;
+		}
+
+		/* ===== INPUTS ===== */
+		input, select {
+		    padding: 4px 6px;
+		    border: 1px solid #ccc;
+		    background: #fff;
+		    border-radius: 4px;
+		    transition: 0.2s;
+		}
+
+		input:focus, select:focus {
+		    border-color: #0d6efd;
+		    box-shadow: 0 0 3px rgba(13,110,253,0.3);
+		    outline: none;
+		}
+
+		/* ===== LABEL ===== */
+		label {
+		    font-size: 12px;
+		    font-weight: 600;
+		    margin-bottom: 2px;
+		}
+
+		/* ===== SMALL SIZE ===== */
+		.small {
+		    font-size: 11px;
+		}
+
+		/* ===== PRODUCT AREA ===== */
+		.product-area {
+		    border: 1px solid #ddd;
+		    border-radius: 6px;
+		    background: #ffffff;
+		    padding: 6px;
+		    overflow-x: auto;
+		}
+
+		/* ===== TABLE ===== */
+		.table {
+		    font-size: 12px;
+		    margin-bottom: 0;
+		}
+
+		.table th {
+		    padding: 6px;
+		    text-align: center;
+		    background: #f4f6f9;
+		    font-weight: 600;
+		    border: 1px solid #ddd;
+		    position: relative;
+		}
+
+		.table td {
+		    padding: 4px 6px;
+		    border: 1px solid #eee;
+		    vertical-align: middle;
+		}
+
+		/* ===== HOVER ===== */
+		.table-hover tbody tr:hover {
+		    background-color: #eef5ff;
+		}
+
+		/* ===== INPUT INSIDE TABLE ===== */
+		.form-control-sm {
+		    height: 26px;
+		    font-size: 12px;
+		    padding: 2px 6px;
+		}
+
+		/* ===== BUTTON ===== */
+		.btn-sm {
+		    padding: 3px 8px;
+		    font-size: 12px;
+		    border-radius: 4px;
+		}
+
+		/* ===== SUGGESTIONS DROPDOWN ===== */
+		.suggestions {
+		    position: absolute;
+		    z-index: 9999;
+		    width: 100%;
+		    max-height: 220px;
+		    overflow-y: auto;
+		    background: #fff;
+		    border: 1px solid #ccc;
+		    border-radius: 4px;
+		}
+
+		/* ===== LIST ITEM ===== */
+		.list-item {
+		    font-size: 12px;
+		    padding: 6px;
+		    cursor: pointer;
+		    transition: 0.2s;
+		}
+
+		.list-item:hover {
+		    background: #eef3ff;
+		}
+
+		/* ===== KEYBOARD HIGHLIGHT ===== */
+		.highlighted {
+		    background-color: #0d6efd !important;
+		    color: #fff !important;
+		}
+
+		/* ===== BATCH DROPDOWN ===== */
+		.batch-dropdown {
+		    position: absolute;
+		    z-index: 9999;
+		    background: #fff;
+		    border: 1px solid #ccc;
+		    max-height: 250px;
+		    overflow-y: auto;
+		    border-radius: 4px;
+		}
+
+		/* ===== BATCH TABLE ===== */
+		.batch-table td,
+		.batch-table th {
+		    font-size: 12px;
+		    padding: 4px;
+		}
+
+		/* ===== COLUMN RESIZER ===== */
+		.resizer {
+		    position: absolute;
+		    right: 0;
+		    top: 0;
+		    width: 5px;
+		    height: 100%;
+		    cursor: col-resize;
+		    user-select: none;
+		}
+
+		.resizer:hover {
+		    background: #0d6efd;
+		}
+
+		/* ===== MODAL FIX ===== */
+		.overlay-modal {
+		    z-index: 1050;
+		}
+
+		/* ===== FOOTER ===== */
+		.footer {
+		    margin-top: 15px;
+		    padding: 6px;
+		    background: #f1f1f1;
+		    text-align: center;
+		    border-top: 1px solid #ddd;
+		    font-weight: 600;
+		}
+
+		/* ===== SMALL TEXT ===== */
+		.small-muted {
+		    font-size: 11px;
+		    color: #777;
+		}
+
+		/* ===== SCROLL FIX ===== */
+		.table-responsive {
+		    overflow-x: auto;
+		}
+
+		/* ===== PREVENT BREAK ===== */
+		.table td,
+		.table th {
+		    white-space: nowrap;
+		}
+
+		/* ===== CARD IMPROVEMENT ===== */
+		.card {
+		    border-radius: 8px;
+		    border: 1px solid #ddd;
+		}
+
+		/* ===== HEADER ===== */
+		.card-header {
+		    background: #f8f9fa;
+		    font-weight: 600;
+		}
+
+		/* ===== BUTTON COLORS ENHANCE ===== */
+		.btn-success {
+		    background-color: #198754;
+		}
+
+		.btn-danger {
+		    background-color: #dc3545;
+		}
+
+		.btn-primary {
+		    background-color: #0d6efd;
+		}
+      </style>
+   </head>
+   <body ng-app="purchaseApp">
+      <div class=" mt-3" ng-controller="MainCtrl">
+      <div class="card">
+         <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+               <strong>Purchase Bill - New</strong>
+               <span class="small-muted ms-2">Ref demo dataset</span>
+            </div>
+            <div>
+               <button class="btn btn-sm btn-success me-2" ng-click="autosaveCurrent && autosaveCurrent()">Auto
+               Save</button>
+               <button class="btn btn-sm btn-warning me-2" ng-click="openPartyModal()"
+                  ng-show="!isPartyModalOpen">Add Party</button>
+               <button class="btn btn-sm btn-info" ng-click="openHtmlPage && openHtmlPage()">Load Page
+               (ng-include)</button>
+               <button class="btn btn-primary btn-sm" ng-click="openProductModal()">
+               Add Product
+               </button>
+            </div>
+         </div>
+         <div class="card-body">
+            <div class="row mb-2">
+               
+				<div class="row g-2">
+
+				    <!-- LEFT -->
+				    <div class="col-md-7">
+
+				        <!-- Party -->
+				        <div class="row g-1 align-items-center mb-1">
+				            <label class="col-3 text-end small fw-bold">Party</label>
+
+				            <div class="col-6 position-relative">
+				                <input class="form-control form-control-sm"
+				                       placeholder="Search party..."
+				                       ng-model="bill.partyName"
+				                       ng-keydown="onSuggestionKeyDown($event, partySuggestions, 'partyHighlightIndex', 'selectPartyFromSuggestion')"
+				                       ng-keyup="searchParty(bill.partyName)" />
+
+				                <!-- Suggestions -->
+				                <div class="suggestions mt-1"
+				                     ng-if="partySuggestions.length">
+				                    <div class="list-group">
+				                        <a class="list-group-item list-item"
+				                           ng-repeat="p in partySuggestions track by $index"
+										   ng-if="bill.partyName !== p.partyName"
+				                           ng-click="selectPartyFromSuggestion(p)"
+				                           ng-class="{'highlighted': $index === partyHighlightIndex}">
+				                           
+				                           <span class="fw-semibold">{{p.partyName}}</span>
+				                           <small class="text-muted d-block">{{p.addressLine1}}</small>
+				                        </a>
+				                    </div>
+				                </div>
+				            </div>
+
+				            <!-- More Info Button -->
+				            <div class="col-3">
+				                <button class="btn btn-outline-secondary btn-sm w-100"
+				                        ng-click="showMore = !showMore">
+				                    {{showMore ? 'Less' : 'More'}}
+				                </button>
+				            </div>
+				        </div>
+
+				    </div>
+
+				    <!-- RIGHT -->
+				    <div class="col-md-5">
+
+				        <!-- Bill No -->
+				        <div class="row g-1 align-items-center mb-1">
+				            <label class="col-4 small fw-bold">Bill No</label>
+
+				            <div class="col-8">
+				                <input class="form-control form-control-sm"
+				                       placeholder="Bill no"
+				                       ng-model="bill.billNo">
+				            </div>
+				        </div>
+
+				    </div>
+
+				</div>
+
+				<!-- 🔽 MORE INFO (HIDDEN BY DEFAULT) -->
+				<div class="row g-2 mt-1" ng-show="showMore">
+
+				    <!-- LEFT -->
+				    <div class="col-md-7">
+
+				        <!-- Email -->
+				        <div class="row g-1 align-items-center mb-1">
+				            <label class="col-3 text-end small fw-bold">Email</label>
+				            <div class="col-9">
+				                <input type="email"
+				                       class="form-control form-control-sm"
+				                       ng-model="bill.email">
+				            </div>
+				        </div>
+
+				        <!-- Mobile -->
+				        <div class="row g-1 align-items-center mb-1">
+				            <label class="col-3 text-end small fw-bold">Mobile</label>
+				            <div class="col-9">
+				                <input type="tel"
+				                       class="form-control form-control-sm"
+				                       ng-model="bill.mobile">
+				            </div>
+				        </div>
+
+				    </div>
+
+				    <!-- RIGHT -->
+				    <div class="col-md-5">
+
+				        <!-- Address -->
+				        <div class="row g-1 align-items-start mb-1">
+				            <label class="col-4 small fw-bold">Address</label>
+				            <div class="col-8">
+				                <input class="form-control form-control-sm mb-1"
+				                       placeholder="Line 1"
+				                       ng-model="bill.addressLine1">
+
+				                <input class="form-control form-control-sm"
+				                       placeholder="Line 2"
+				                       ng-model="formData.addressLine2">
+				            </div>
+				        </div>
+
+				    </div>
+
+				</div>
+               <!-- Product table area  //add batch funcanality not work html is currect  -->
+			   
+<!--			   <div class="product-area mb-2">-->
+
+<!--			   <table class="table table-bordered table-hover table-sm invoice-table mb-0">-->
+
+<!--			        HEADER -->
+<!--			       <thead class="table-light">-->
+<!--			           <tr>-->
+<!--			               <th>#</th>-->
+<!--			               <th style="width:22%">Product <div class="resizer"></th>-->
+<!--			               <th>Pack <div class="resizer"></th>-->
+<!--			               <th>Cmp <div class="resizer"></th>-->
+<!--			               <th>Exp <div class="resizer"></th>-->
+<!--			               <th>Sch <div class="resizer"></th>-->
+<!--			               <th style="width:6%">Qty <div class="resizer"></th>-->
+<!--			               <th>Batch <div class="resizer"></th>-->
+<!--			               <th>MRP <div class="resizer"></th>-->
+<!--			               <th>Rate <div class="resizer"></th>-->
+<!--			               <th>GST <div class="resizer"></th>-->
+<!--			               <th>Amt <div class="resizer"></th>-->
+<!--			               <th>Del <div class="resizer"></th>-->
+<!--			           </tr>-->
+<!--			       </thead>-->
+
+<!--			       <tbody>-->
+
+<!--			            EXISTING ITEMS -->
+<!--			           <tr ng-repeat="it in bill.items track by $index">-->
+<!--			               <td>{{$index + 1}}</td>-->
+<!--			               <td class="fw-semibold">{{it.name}}</td>-->
+<!--			               <td>{{it.packing}}</td>-->
+<!--			               <td>{{it.company}}</td>-->
+<!--			               <td>{{it.expiry}}</td>-->
+<!--			               <td>{{it.sch}}</td>-->
+
+<!--			               <td>-->
+<!--			                   <input type="number"-->
+<!--			                          class="form-control form-control-sm text-center"-->
+<!--			                          ng-model="it.qty"-->
+<!--			                          ng-change="recalcLine(it)">-->
+<!--			               </td>-->
+
+<!--			               <td>{{it.batch}}</td>-->
+<!--			               <td>{{it.mrp}}</td>-->
+<!--			               <td>{{it.rate}}</td>-->
+<!--			               <td>{{it.gst}}</td>-->
+<!--			               <td class="fw-bold">{{it.amount | number:2}}</td>-->
+
+<!--			               <td>-->
+<!--			                   <button class="btn btn-danger btn-sm px-2"-->
+<!--			                           ng-click="removeItem($index)">×</button>-->
+<!--			               </td>-->
+<!--			           </tr>-->
+
+<!--			            ADD NEW PRODUCT ROW -->
+<!--			           <tr class="add-row">-->
+
+<!--			               <td>+</td>-->
+
+<!--			               <td style="position:relative;">-->
+<!--			                   <input class="form-control form-control-sm"-->
+<!--			                          placeholder="Search product..."-->
+<!--			                          ng-model="newItem.name"-->
+<!--			                          ng-change="searchProductLocal(newItem.name)"-->
+<!--			                          ng-keydown="onSuggestionKeyDown($event, productSuggestions, 'productHighlightIndex', 'selectProduct')" />-->
+
+<!--			                    Suggestions -->
+<!--			                   <div class="suggestions" ng-if="productSuggestions.length">-->
+<!--			                       <div class="list-group">-->
+<!--			                           <a class="list-group-item list-item"-->
+<!--			                              ng-repeat="p in productSuggestions track by $index"-->
+<!--			                              ng-click="selectProduct(p)"-->
+<!--			                              ng-class="{'highlighted': $index === productHighlightIndex}">-->
+			                              
+<!--			                              <b>{{p.name}}</b>-->
+<!--			                              <small class="d-block text-muted">-->
+<!--			                                  {{p.company}} | {{p.packing}}-->
+<!--			                              </small>-->
+<!--			                           </a>-->
+<!--			                       </div>-->
+<!--			                   </div>-->
+<!--			               </td>-->
+
+<!--			               <td><input class="form-control form-control-sm" ng-model="newItem.packing" readonly></td>-->
+<!--			               <td><input class="form-control form-control-sm" ng-model="newItem.company" readonly></td>-->
+<!--			               <td><input class="form-control form-control-sm" ng-model="newItem.expiry" readonly></td>-->
+<!--			               <td><input class="form-control form-control-sm" ng-model="newItem.sch"></td>-->
+
+<!--			               <td>-->
+<!--			                   <input type="number"-->
+<!--			                          class="form-control form-control-sm text-center"-->
+<!--			                          ng-model="newItem.qty">-->
+<!--			               </td>-->
+
+<!--			               <td>-->
+<!--			                   <input class="form-control form-control-sm"-->
+<!--			                          ng-model="newItem.batch"-->
+<!--			                          readonly>-->
+<!--			               </td>-->
+
+<!--			               <td><input class="form-control form-control-sm" ng-model="newItem.mrp" readonly></td>-->
+<!--			               <td><input class="form-control form-control-sm" ng-model="newItem.rate" readonly></td>-->
+<!--			               <td><input class="form-control form-control-sm" ng-model="newItem.gstPercent"></td>-->
+<!--			               <td><input class="form-control form-control-sm" ng-model="newItem.amount"></td>-->
+
+<!--			               <td></td>-->
+<!--			           </tr>-->
+
+<!--			            ADD BUTTON -->
+<!--			           <tr>-->
+<!--			               <td colspan="13" class="text-end">-->
+<!--			                   <button class="btn btn-success btn-sm px-3"-->
+<!--			                           ng-click="addProductToBill()">-->
+<!--			                       + Add Product-->
+<!--			                   </button>-->
+<!--			               </td>-->
+<!--			           </tr>-->
+
+<!--			       </tbody>-->
+
+<!--			   </table>-->
+<!--			   </div>-->
+			   
+
+               <div class="product-area mb-2">
+                  <table class="table table-sm table-bordered mb-0">
+                     <thead>
+                        <tr>
+                           <th style="width:24%;"> <div class="resizer">Product</th>
+                           <th>Pack <div class="resizer"></th>
+                           <th>Cmp <div class="resizer"></th>
+                           <th>Expiry <div class="resizer"></th>
+                           <th>Sch <div class="resizer"></th>
+                           <th style="width:6%;" ><div class="resizer">Qty</th>
+                           <th>Batch <div class="resizer"></th>
+                           <th>Amount <div class="resizer"></th>
+                           <th>MRP <div class="resizer"></th>
+                           <th>Rate <div class="resizer"></th>
+                           <th>GST <div class="resizer"></th>
+                           <th style="width:5%;"> Del<div class="resizer"></th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <tr ng-repeat="it in bill.items track by $index">
+                           <td>{{it.name}}</td>
+                           <td>{{it.packing}}</td>
+                           <td>{{it.companyName}}</td>
+                           <td>{{it.expiry}}</td>
+                           <td>{{it.sch || ''}}</td>
+                           <td><input type="number" class="form-control form-control-sm" ng-model="it.qty"
+                              ng-change="recalcLine(it)" /></td>
+                           <td>{{it.batch || ''}}</td>
+                           <td>{{it.amount | number:2}}</td>
+                           <td>{{it.mrp}}</td>
+                           <td>{{it.rate}}</td>
+                           <td>{{it.gst}}</td>
+                           <td><button class="btn btn-sm btn-danger" ng-click="removeItem($index)">x</button>
+                           </td>
+                        </tr>
+                         Add new product row (search) 
+                        <tr>
+                           <td style="position:relative;">
+                              <input class="form-control form-control-sm" id="newprod" ng-model="newItem.name"
+                                 autocomplete="off" ng-change="searchProductLocal(newItem.name)" ng-keydown="onSuggestionKeyDown($event,
+                                 productSuggestions,
+                                 'productHighlightIndex',
+                                 'selectProduct')" placeholder="Type product name..." />
+                              <div class="card suggestions" ng-if="productSuggestions.length">
+                                 <div class="list-group">
+                                    <a class="list-group-item list-item"
+                                       ng-repeat="p in productSuggestions track by $index"
+                                       ng-click="selectProduct(p)"
+                                       ng-class="{'highlighted': $index === productHighlightIndex}">
+                                    <b>{{p.name}}</b> — {{p.packing}} — {{p.company}} — Stock:
+                                    {{p.stock}}
+                                    </a>
+                                 </div>
+                              </div>
+                              <div class="batch-dropdown" ng-if="showBatchDropdown" tabindex="0"
+                                 ng-keydown="onSuggestionKeyDown($event, batchList, 'batchHighlightIndex', 'selectBatch')">
+                                 <table class="table table-sm table-bordered batch-table mb-0">
+                                    <thead>
+                                       <tr>
+                                          <th>Batch</th>
+                                          <th>Expiry</th>
+                                          <th>MRP</th>
+                                          <th>TR Rate</th>
+                                          <th>Purchase Rate</th>
+                                          <th>Stock</th>
+                                       </tr>
+                                    </thead>
+                                    <tbody tabindex="0"
+                                       ng-keydown="onSuggestionKeyDown($event, batchList, 'batchHighlightIndex', 'selectBatch')">
+                                       <tr ng-repeat="b in batchList track by b.id"
+                                          ng-class="{'highlighted': $index === batchHighlightIndex}"
+                                          ng-click="selectBatch(b)">
+                                          <td>{{b.batch}}</td>
+                                          <td>{{b.expiry | date:'MM/yyyy'}}</td>
+                                          <td>{{b.mrp}}</td>
+                                          <td>{{b.trRate}}</td>
+                                          <td>{{b.purchaseRate}}</td>
+                                          <td>{{b.currentStock}}</td>
+                                       </tr>
+                                       												<button class="btn btn-sm btn-primary"
+                                       													ng-click="openAddBatchRow()">+</button>
+                                       <button class="btn btn-sm btn-primary"
+                                          ng-click="openAddBatch()">+</button>
+                                    </tbody>
+                                 </table>
+                              </div>
+                           </td>
+                           <td><input class="form-control form-control-sm" ng-model="newItem.packing"
+                              readonly />
+                           </td>
+                           <td><input class="form-control form-control-sm" ng-model="newItem.company"
+                              readonly />
+                           </td>
+                           <td><input class="form-control form-control-sm" ng-model="newItem.expiry"
+                              readonly />
+                           </td>
+                           <td><input class="form-control form-control-sm" ng-model="newItem.sch" /></td>
+                           <td><input type="number" class="form-control form-control-sm"
+                              ng-model="newItem.qty" />
+                           </td>
+                           <td>
+                              <div class="input-group">
+                                 <input class="form-control form-control-sm" ng-model="newItem.batch"
+                                    readonly />
+                                 										<button class="btn btn-outline-primary btn-sm" type="button"
+                                 											ng-click="openBatchModal()">Batches</button>
+                              </div>
+                           </td>
+                           <td><input class="form-control form-control-sm" ng-model="newItem.amount" /></td>
+                           <td><input class="form-control form-control-sm" ng-model="newItem.mrp" readonly />
+                           </td>
+                           <td><input class="form-control form-control-sm" ng-model="newItem.rate" readonly />
+                           </td>
+                           <td><input class="form-control form-control-sm" ng-model="newItem.gstPercent" />
+                           </td>
+                           <td></td>
+                        </tr>
+                        <tr>
+                           <td colspan="12" class="text-end">
+                              <button class="btn btn-sm btn-success" ng-click="addProductToBill()">Add
+                              Product</button>
+                           </td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </div>
+			   
+			   
+			   
+			   
+			   
+               <!-- Totals and actions -->
+			   <div class="row g-2 align-items-center mt-2">
+
+			       <!-- LEFT SIDE (Notes + Inputs in ONE LINE) -->
+			       <div class="col-md-6 d-flex flex-wrap align-items-center gap-2 small">
+
+			           <label class="fw-bold mb-0">Txn</label>
+			           <select ng-model="bill.transactionType"
+			                   class="form-select form-select-sm w-auto">
+			               <option>Cash</option>
+			               <option>Credit</option>
+			           </select>
+
+			           <label class="fw-bold mb-0">Due</label>
+			           <input type="date"
+			                  ng-model="bill.dueDate"
+			                  class="form-control form-control-sm w-auto">
+
+			       </div>
+
+			       <!-- RIGHT SIDE (TOTALS INLINE LIKE BILLING SOFTWARE) -->
+			       <div class="col-md-6">
+
+			           <div class="d-flex flex-wrap justify-content-end gap-3 small">
+
+			               <div><b>Items:</b> {{totals.totalItem}}</div>
+			               <div><b>Qty:</b> {{totals.totalQuantity}}</div>
+			               <div><b>GST:</b> {{totals.gst | number:2}}</div>
+			               <div><b>Free:</b> {{totals.totalFree}}</div>
+			               <div><b>Amt:</b> <span class="fw-bold text-primary">{{totals.totalAmount | number:2}}</span></div>
+
+			           </div>
+
+			           <!-- Save Button -->
+			           <div class="text-end mt-1">
+			               <button class="btn btn-success btn-sm px-3"
+			                       ng-click="saveBill()">
+			                   Save
+			               </button>
+			           </div>
+
+			       </div>
+
+			   </div>			   
+			   
+            </div>
+            <div class="card-footer small-muted">
+               <!--					Demo single-file AngularJS — Bootstrap 5 markup & API calls.-->
+            </div>
+         </div>
+         <!-- Optional included page using ng-include -->
+         <div ng-if="includePage" class="mt-3 card">
+            <div class="card-body">
+               <div ng-include="'/inline-pages/sample-page.html'"></div>
+            </div>
+         </div>
+         <!-- Stored bills list -->
+         <div class="mt-3">
+            <h5>Saved Bills (local)</h5>
+            <table class="table table-sm table-bordered">
+               <thead>
+                  <tr>
+                     <th>BillNo</th>
+                     <th>BillDate</th>
+                     <th>Trans</th>
+                     <th>TotalQty</th>
+                     <th>TotalAmount</th>
+                  </tr>
+               </thead>
+               <tbody>
+                  <tr ng-repeat="b in savedBills">
+                     <td>{{b.billNo}}</td>
+                     <td>{{b.billDate}}</td>
+                     <td>{{b.transactionType}}</td>
+                     <td>{{b.totalQuantity}}</td>
+                     <td>{{b.totalAmount | number:2}}</td>
+                  </tr>
+               </tbody>
+            </table>
+         </div>
+         <!--		 Batch selection modal (custom via ng-show) -->
+         <div class="modal overlay-modal" tabindex="-1" role="dialog" ng-show="showBatchModal"
+            style="background:rgba(0,0,0,0.4)">
+            <div class="modal-dialog modal-lg" role="document">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h5 class="modal-title">Batches for: {{selectedProduct.name}}</h5>
+                     <button type="button" class="btn-close" ng-click="closeBatchModal()"
+                        aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                     <table class="table table-sm table-bordered">
+                        <thead>
+                           <tr>
+                              <th>Batch</th>
+                              <th>Expiry</th>
+                              <th>MRP</th>
+                              <th>TR Rate</th>
+                              <th>Pur Rate</th>
+                              <th>Stock</th>
+                              <!--				               removed Action column -->
+                           </tr>
+                        </thead>
+                        <!--				           NOTE: keydown moved to <tbody> which we focus programmatically -->
+                        <tbody id="batchTbody" tabindex="0"
+                           ng-keydown="onSuggestionKeyDown($event, batchList, 'batchHighlightIndex', 'selectBatchFromTable')">
+                           <!--				             Add new batch row (optional) -->
+<!--                           <tr>-->
+<!--                              <td><input type="text" ng-model="newBatch.batch" class="form-control"-->
+<!--                                 placeholder="Batch No"></td>-->
+<!--                              <td><input type="date" ng-model="newBatch.expiry" class="form-control"></td>-->
+<!--                              <td><input type="number" ng-model="newBatch.mrp" class="form-control"-->
+<!--                                 placeholder="MRP"></td>-->
+<!--                              <td><input type="number" ng-model="newBatch.trRate" class="form-control"-->
+<!--                                 placeholder="TR Rate"></td>-->
+<!--                              <td><input type="number" ng-model="newBatch.purchaseRate" class="form-control"-->
+<!--                                 placeholder="Purchase Rate"></td>-->
+<!--                              <td><input type="number" ng-model="newBatch.currentStock" class="form-control"-->
+<!--                                 placeholder="Stock"></td>-->
+<!--                           </tr>-->
+                           <!--		
+							
+									            // batch rows -->
+							<tr ng-click="openAddBatch()"><td>Add new Batch</td></tr>					
+                           <tr ng-repeat="b in batchList track by $index"
+                              ng-class="{'highlighted': $index === batchHighlightIndex}">
+                              <td>{{b.batch}}</td>
+                              <td>{{b.expiry}}</td>
+                              <td>{{b.mrp}}</td>
+                              <td>{{b.trRate}}</td>
+                              <td>{{b.purchaseRate}}</td>
+                              <td>{{b.currentStock}}</td>
+                           </tr>
+                        </tbody>
+                     </table>
+                     <div class="text-end">
+                        <button class="btn btn-sm btn-secondary" ng-click="closeBatchModal()">Close</button>
+                        <button class="btn btn-sm btn-success" ng-click="openAddBatch()">Add New Batch
+                        (local)</button>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         
+         <div class="modal overlay-modal" tabindex="-1" role="dialog" ng-show="showAddBatchModal"
+            style="background:rgba(0,0,0,0.4)">
+            <div class="" role="document" style="
+               ">
+               <div class="card" style="
+                  padding: 15px;
+                  ">
+                  <div class="">
+                     <p class="modal-title ng-binding">Batches for: {{selectedProduct.name}}</p>
+                     <button class="btn-close" ng-click="closeAddBatch()" aria-label="Close" style="
+                        float: right;
+                        "></button>
+                  </div>
+                  <div class="">
+                     <table>
+                        <!--							<tr ng-if="showAddBatchRow">-->
+                        <tbody>
+                           <tr>
+                              <th>Batch</th>
+                              <th>Expiry</th>
+                              <th>MRP</th>
+                              <th>TR Rate</th>
+                              <th>Purchase Rate</th>
+                              <th>Stock</th>
+                           </tr>
+                           <tr>
+                              <td>
+                                 <input id="newBatchInput" type="text" ng-model="newBatch.batch"
+                                    class="form-control ng-pristine ng-valid ng-empty ng-touched"
+                                    placeholder="Batch No">
+                              </td>
+                              <td><input type="date" ng-model="newBatch.expiry"
+                                 class="form-control ng-pristine ng-untouched ng-valid ng-empty"></td>
+                              <td><input type="number" ng-model="newBatch.mrp"
+                                 class="form-control ng-pristine ng-untouched ng-valid ng-not-empty"
+                                 placeholder="MRP"></td>
+                              <td><input type="number" ng-model="newBatch.trRate"
+                                 class="form-control ng-pristine ng-untouched ng-valid ng-not-empty"
+                                 placeholder="TR Rate"></td>
+                              <td><input type="number" ng-model="newBatch.purchaseRate"
+                                 class="form-control ng-pristine ng-untouched ng-valid ng-not-empty"
+                                 placeholder="Purchase Rate"></td>
+                              <td><input type="number" ng-model="newBatch.currentStock"
+                                 class="form-control ng-pristine ng-untouched ng-valid ng-not-empty"
+                                 placeholder="Stock"></td>
+                              <td>
+                                 <button type="button" class="btn btn-sm btn-success"
+                                    ng-click="saveBatchLocal(newBatch)">
+                                 Add Batch
+                                 </button>
+                              </td>
+                           </tr>
+                        </tbody>
+                     </table>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <!-- ADD / EDIT PRODUCT MODAL -->
+         <div class="modal fade" id="addProductModal" tabindex="-1" aria-hidden="true">
+<!--			//<div ng-include="'Product.html'"></div>-->
+            <div class="modal-dialog modal-lg">
+               <div class="modal-content">
+                  <p class="modal-title">
+                     {{ isUpdateMode ? 'Update Product' : 'Add Product' }}
+                  </p>
+                  <button type="button" class="btn-close" ng-click="closeProductModal()"></button>
+                  <div class="modal-body">
+                     <table class="table table-bordered table-sm">
+                        <tbody>
+                           <tr>
+                              <th style="width:180px;">Name</th>
+                              <th>Packing</th>
+                              <th>Loose</th>
+                              <th>Company</th>
+                              <th>Stock</th>
+                              <th>Shelf</th>
+                              <th>CMP</th>
+                              <th>HSN No</th>
+                              <th>GST %</th>
+                           </tr>
+                           <tr>
+                              <td>
+                                 <input type="text" class="form-control" ng-model="formData.name"
+                                    placeholder="Enter Name">
+                              </td>
+                              <td>
+                                 <input type="text" class="form-control" ng-model="formData.packing"
+                                    placeholder="Enter Packing">
+                              </td>
+                              <td>
+                                 <input type="text" class="form-control" ng-model="formData.loose"
+                                    placeholder="Enter Loose">
+                              </td>
+                              <td>
+                                 <input type="text" class="form-control" ng-model="formData.company"
+                                    placeholder="Enter Company">
+                              </td>
+                              <td>
+                                 <input type="number" class="form-control" ng-model="formData.stock"
+                                    placeholder="Enter Stock">
+                              </td>
+                              <td>
+                                 <input type="text" class="form-control" ng-model="formData.shelf"
+                                    placeholder="Enter Shelf No">
+                              </td>
+                              <td>
+                                 <input type="text" class="form-control" ng-model="formData.cmp"
+                                    placeholder="Enter CMP">
+                              </td>
+                              <td>
+                                 <input type="text" class="form-control" ng-model="formData.hsnNo"
+                                    placeholder="Enter HSN No">
+                              </td>
+                              <td>
+                                 <input type="text" class="form-control" ng-model="formData.gst"
+                                    placeholder="Enter GST %">
+                              </td>
+                           </tr>
+                        </tbody>
+                     </table>
+                  </div>
+                  <div class="modal-footer">
+                     <button class="btn btn-secondary btn-sm" ng-click="closeProductModal()">Close</button>
+                     <button class="btn btn-success btn-sm" ng-click="saveProduct()">Save</button>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <!-- ADD PARTY MODAL (BOOTSTRAP 5) -->
+         <div class="modal fade" id="addPartyModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+               <div class="modal-content">
+                  <!--						 HEADER -->
+                  <div class="modal-header">
+                     <h5 class="modal-title">Add / Edit Party</h5>
+                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+                  <!--						 BODY -->
+                  <div class="modal-body">
+                     <form>
+                        <div class="row">
+                           <div class="col-md-6">
+                              <!--										 Party Name -->
+                              <div class="mb-3">
+                                 <label class="form-label">Party Name</label>
+                                 <input type="text" class="form-control form-control-sm"
+                                    ng-model="formData.partyName">
+                              </div>
+                              <!--									//	 Address -->
+                              <div class="mb-3">
+                                 <label class="form-label">Address</label>
+                                 <input type="text" class="form-control form-control-sm mb-1"
+                                    ng-model="formData.addressLine1">
+                                 <input type="text" class="form-control form-control-sm"
+                                    ng-model="formData.addressLine2">
+                              </div>
+                              <!--										// Telephone / Fax -->
+                              <div class="row mb-3">
+                                 <div class="col-6">
+                                    <label class="form-label">Telephone</label>
+                                    <input type="text" class="form-control form-control-sm"
+                                       ng-model="formData.telephone">
+                                 </div>
+                                 <div class="col-6">
+                                    <label class="form-label">Fax</label>
+                                    <input type="text" class="form-control form-control-sm"
+                                       ng-model="formData.faxNumber">
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="col-md-6">
+                              <!--										 Mobile -->
+                              <div class="mb-3">
+                                 <label class="form-label">Mobile</label>
+                                 <input type="text" class="form-control form-control-sm"
+                                    ng-model="formData.mobile">
+                              </div>
+                              <!--										 Email -->
+                              <div class="mb-3">
+                                 <label class="form-label">Email</label>
+                                 <input type="email" class="form-control form-control-sm"
+                                    ng-model="formData.email">
+                              </div>
+                              <!--										 Contact Person -->
+                              <div class="mb-3">
+                                 <label class="form-label">Contact Person</label>
+                                 <input type="text" class="form-control form-control-sm"
+                                    ng-model="formData.contactPerson">
+                              </div>
+                              <!--										 PAN / GST -->
+                              <div class="row mb-3">
+                                 <div class="col-6">
+                                    <label class="form-label">PAN</label>
+                                    <input type="text" class="form-control form-control-sm"
+                                       ng-model="formData.panNo">
+                                 </div>
+                                 <div class="col-6">
+                                    <label class="form-label">GST No.</label>
+                                    <input type="text" class="form-control form-control-sm"
+                                       ng-model="formData.gstNo">
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </form>
+                  </div>
+                  <!-- MODAL -->
+                  <!-- FOOTER -->
+                  <div class="modal-footer">
+                     <button type="button" class="btn btn-secondary btn-sm"
+                        data-bs-dismiss="modal">Close</button>
+                     <!-- CREATE -->
+                     <button class="btn btn-success" ng-click="saveDetails()">Save</button>
+                     <!-- UPDATE -->
+                     <button type="button" class="btn btn-warning btn-sm" ng-show="isUpdateMode"
+                        ng-click="updateDetails()">Update</button>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <!-- Bootstrap 5 JS (bundled with Popper) -->
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+	  
+	  <script>
+	  document.querySelectorAll(".resizer").forEach(resizer => {
+	      let x = 0;
+	      let th = resizer.parentElement;
+
+	      const mouseDownHandler = function (e) {
+	          x = e.clientX;
+
+	          document.addEventListener("mousemove", mouseMoveHandler);
+	          document.addEventListener("mouseup", mouseUpHandler);
+	      };
+
+	      const mouseMoveHandler = function (e) {
+	          const dx = e.clientX - x;
+	          x = e.clientX;
+
+	          const width = th.offsetWidth + dx;
+	          th.style.width = width + "px";
+	      };
+
+	      const mouseUpHandler = function () {
+	          document.removeEventListener("mousemove", mouseMoveHandler);
+	          document.removeEventListener("mouseup", mouseUpHandler);
+	      };
+
+	      resizer.addEventListener("mousedown", mouseDownHandler);
+	  });
+	  </script>
+      <script>
+         var app =angular.module('purchaseApp', []);
+         
+		
+		 app.controller('MainCtrl', ['$scope', '$timeout', '$http', function ($scope, $timeout, $http) {
+         
+         		// ---------- initialize ----------
+         		$scope.products = [];
+         		$scope.savedBills = [];
+         		$scope.parties = [];
+         
+         		$scope.bill = {
+         			gstNo: '', sgstPercent: 0, cgstPercent: 0,
+         			billNo: '', transactionType: 'Cash',
+         			billDate: new Date(),   // ✔ FIXED
+         			dueDate: new Date(),    // ✔ FIXED
+         			outstandingAmount: 0, totalItem: 0, totalQuantity: 0, gst: 0, totalReplace: 0, totalFree: 0, totalAmount: 0,
+         			party: {}, items: []
+         		};
+         
+         		$scope.totals = {totalItem: 0, totalQuantity: 0, gst: 0, totalReplace: 0, totalFree: 0, totalAmount: 0};
+         
+         		$scope.productQuery = '';
+         		$scope.productSuggestions = [];
+         		$scope.partySuggestions = [];
+         		$scope.newItem = {};
+         		$scope.showBatchModal = false;
+         		$scope.showAddBatchModal = false;
+         		$scope.selectedProduct = null;
+         		$scope.batchList = [];
+         		$scope.newBatch = {};
+         		$scope.formData = {};
+         		$scope.isUpdateMode = false;
+         		$scope.highlightIndex = 0;
+         
+         		//$scope.isPartySelecting=false;
+         		$scope.partyHighlightIndex = 0;
+         		$scope.productHighlightIndex = 0;
+         		$scope.batchHighlightIndex = 0;
+         
+         		$scope.selectBatchFromTable = function (batch) {
+         			// whatever action you want
+         			$scope.newBatch = angular.copy(batch);
+         			$scope.showAddBatchModal = false;
+         			console.log("Batch Selected:", batch);
+         		};
+         
+         		
+         		// COMMON function for ALL suggestions
+         		$scope.onSuggestionKeyDown = function (event, suggestions, indexName, selectFunction) {
+         			if (!suggestions || suggestions.length === 0) return;
+         
+         			let idx = $scope[indexName] ?? 0;
+         
+         			switch (event.keyCode) {
+         
+         				case 40: // DOWN
+         					event.preventDefault();
+         					if (idx < suggestions.length - 1) {
+         						$scope[indexName] = idx + 1;
+         					}
+         					break;
+         
+         				case 38: // UP
+         					event.preventDefault();
+         					if (idx > 0) {
+         						$scope[indexName] = idx - 1;
+         					}
+         					break;
+         
+         				case 13: // ENTER
+         					event.preventDefault();
+         					const item = suggestions[$scope[indexName]];
+         					if (item) {
+         						$scope[selectFunction](item);
+         					}
+         					break;
+         			}
+         		};
+         
+         		// ---------- totals helper ----------
+         		$scope.recalcTotals = function () {
+         			const items = $scope.bill.items || [];
+         			$scope.totals.totalItem = items.length;
+         			$scope.totals.totalQuantity = items.reduce((s, i) => s + (Number(i.qty) || 0), 0);
+         			$scope.totals.gst = items.reduce((s, i) => s + ((Number(i.amount) || 0) * ((Number(i.gstPercent) || 0) / 100)), 0);
+         			$scope.totals.totalAmount = items.reduce((s, i) => s + (Number(i.amount) || 0), 0) + $scope.totals.gst;
+         			$scope.totals.totalReplace = items.reduce((s, i) => s + (Number(i.replace) || 0), 0);
+         			$scope.totals.totalFree = items.reduce((s, i) => s + (Number(i.free) || 0), 0);
+         		};
+         
+         		// ---------------- Product search ----------------
+         		let prodTimer = null;
+         		$scope.searchProductLocal = function (q) {
+         			if (prodTimer) $timeout.cancel(prodTimer);
+         			$scope.productSuggestions = [];
+					if(q=="new"|| q=="NEW"||q=="add"||q=="ADD"){
+											$scope.openProductModal();
+										}
+         			if (!q || q.length < 2) return;
+         			prodTimer = $timeout(function () {
+         				$http.get('/api/product/search?name=' + encodeURIComponent(q))
+         					.then(function (resp) {
+         						$scope.productSuggestions = resp.data || [];
+								console.log($scope.productSuggestions);
+         					})
+         					.catch(function (err) {
+         						console.error('Product search error', err);
+         						$scope.productSuggestions = [];
+         					});
+         			}, 150);
+         		};
+         
+         		
+         		$scope.selectProduct = function (p) {
+         			$scope.selectedProduct = p;
+         
+         			$scope.newItem = {
+         				productId: p.id,
+         				name: p.name,
+         				packing: p.packing,
+         				company: p.company,
+         				expiry: '',
+         				batch: '',
+         				qty: 1,
+         				amount: 0,
+         				mrp: (p.batches && p.batches.length) ? p.batches[0].mrp : '',
+         				rate: (p.batches && p.batches.length) ? (p.batches[0].saleRate || p.batches[0].trRate) : 0,
+         				gstPercent: p.gstPercent || 0
+         			};
+         
+         			$scope.productSuggestions = [];
+         			//	$scope.showBatchModal = true;  // Open modal
+         			// Load batch list
+         			$http.get('/api/batch/product/' + p.id)
+         				.then(function (resp) {
+         					$scope.batchList = resp.data || [];
+         					$scope.batchHighlightIndex = ($scope.batchList.length > 0) ? 0 : -1;
+         
+         					// Show inline batch dropdown
+         					$scope.showBatchDropdown = $scope.batchList.length > 0;
+							if(!$scope.batchList.length > 0){
+								$scope.openAddBatch()
+							}
+							
+							
+         					// Focus batch dropdown to capture arrow keys
+         					$timeout(function () {
+         						var el = document.querySelector('.batch-dropdown');
+         						if (el) el.focus();
+         					}, 50);
+         				})
+         				.catch(function (err) {
+         					console.warn('Error loading batches', err);
+         					$scope.batchList = [];
+         					$scope.showBatchDropdown = false;
+         				});
+         		};
+         
+         		// ---------------- Batches ----------------
+         		$scope.openBatchModal = function () {
+         			$scope.showBatchModal = true;
+         			$scope.showAddBatchModal = false;
+         		};
+         		$scope.closeBatchModal = function () {
+         			$scope.showBatchModal = false;
+         			$scope.batchList = [];
+         		};
+         
+         		$scope.selectBatch = function (b) {
+         			$scope.showBatchDropdown = false;
+         			$scope.newItem.batch = b.batch;
+         			$scope.newItem.expiry = b.expiry;
+         			$scope.newItem.mrp = b.mrp;
+         			$scope.newItem.rate = b.saleRate || b.trRate || 0;
+         			$scope.newItem.amount = (Number($scope.newItem.qty) || 1) * (Number($scope.newItem.rate) || 0);
+         			$scope.closeBatchModal();
+         		};
+         
+         		$scope.openAddBatch = function () {
+         			if (!$scope.selectedProduct || !$scope.selectedProduct.id) return alert('Select product first');
+         			$scope.showAddBatchModal = true;
+         			// Focus on first input after row appears
+         
+         
+         			setTimeout(() => {
+         				const input = document.getElementById("newBatchInput");
+         				if (input) input.focus();
+         			}, 50);
+         			$scope.newBatch = {batch: '', expiry: '', mrp: 0, trRate: 0, purchaseRate: 0, saleRate: 0, currentStock: 0, supplier: ''};
+         		};
+         		$scope.closeAddBatch = function () {$scope.showAddBatchModal = false;};
+
+         		$scope.saveBatchLocal = function () {
+         
+         			if (!$scope.selectedProduct || !$scope.selectedProduct.id)
+         				return alert('Select product first');
+         
+         			const payload = angular.copy($scope.newBatch);
+         
+         			// Convert expiry date here
+         			if (payload.expiry) {
+         				payload.expiry = formatDateDDMMYYYY(payload.expiry);
+         			}
+         
+         			console.log("Sending Payload:", payload);
+         
+         			$http.post('/api/batch/product/' + $scope.selectedProduct.id, payload)
+         				.then(function (resp) {
+         					console.log("Batch Added Successfully:", resp.data);
+         					return $http.get('/api/batch/product/' + $scope.selectedProduct.id);
+         				})
+         				.then(function (resp2) {
+         					$scope.batchList = resp2.data;
+         					$scope.showAddBatchModal = false;
+         					$scope.newBatch = {};
+         				})
+         				.catch(function (err) {
+         					console.error("Error", err);
+         					alert("Error saving batch");
+         				});
+         		};
+         
+         		function formatDateDDMMYYYY(dateString) {
+         			const d = new Date(dateString);
+         			const day = ("0" + d.getDate()).slice(-2);
+         			const month = ("0" + (d.getMonth() + 1)).slice(-2);
+         			const year = d.getFullYear();
+         			return `${day}/${month}/${year}`;
+         		}
+         
+         		// ---------------- Add product to bill ----------------
+         		$scope.addProductToBill = function () {
+         			//if (!$scope.newItem || !$scope.newItem.productId) return alert('Select product');
+         			//if (!$scope.newItem.batch) return alert('Select batch for product');
+         			setTimeout(() => {
+         				const input = document.getElementById("newprod");
+         				if (input) input.focus();
+         			}, 50);
+         
+         			const line = angular.copy($scope.newItem);
+         			line.qty = Number(line.qty || 0);
+         			line.amount = Number(line.amount || ((line.qty || 0) * (line.rate || 0)));
+         			$scope.bill.items.push(line);
+         			$scope.newItem = {};
+         			$scope.productQuery = '';
+         			$scope.recalcTotals();
+         		};
+         
+         		$scope.recalcLine = function (it) {
+         			it.amount = (Number(it.qty) || 0) * (Number(it.rate) || 0);
+         			$scope.recalcTotals();
+         		};
+         
+         		$scope.removeItem = function (idx) {
+         			$scope.bill.items.splice(idx, 1);
+         			$scope.recalcTotals();
+         		};
+         
+         		// ---------------- Party Search / Select / Add / Update ----------------
+         		let partyTimer = null;
+         		$scope.searchParty = function (q) {
+         			if (partyTimer) $timeout.cancel(partyTimer);
+         			$scope.partySuggestions = [];
+         			
+         			if(q=="new"|| q=="NEW"||q=="add"||q=="ADD"){
+						$scope.openPartyModal();
+					}
+         			
+         			if (!q || q.length < 2)return;
+         				
+         			 
+         		
+         			partyTimer = $timeout(function () {
+         				$http.get('http://localhost:8080/api/party/search?name=' + encodeURIComponent(q))
+         					.then(function (resp) {
+         						
+         						$scope.partySuggestions = resp.data || [];
+         					})
+         					.catch(function (err) {
+         						console.error('Party search error', err);
+         						$scope.partySuggestions = [];
+         					});
+         			}, 150);
+         		};
+         
+         		$scope.selectPartyFromSuggestion = function (p) {
+         			
+         			$scope.bill.party = angular.copy(p);
+         			$scope.bill.mobile = p.mobile;
+         			$scope.bill.email = p.email;
+         			$scope.bill.contactPerson = p.contactPerson;
+         			$scope.bill.panNo = p.panNo;
+         			$scope.bill.addressLine1 = p.addressLine1;
+         			$scope.bill.addressLine2 = p.addressLine2;
+         			$scope.bill.partyName = p.partyName;
+         			$scope.bill.gstNo = p.gstNo;
+         			$scope.bill.sgstPercent = p.sgstPercent || 0;
+         			$scope.bill.cgstPercent = p.cgstPercent || 0;
+         			
+         			$scope.partySuggestions = [];
+         			  $scope.partyHighlightIndex = -1;   // ✅ FIX
+         			
+         			
+         		};
+         
+         		// ---------- Party modal open/close using Bootstrap 5 API ----------
+         		$scope.openProductModal = function (product) {
+         			$scope.formData = product ? angular.copy(product) : {};
+         			$scope.isUpdateMode = !!product;
+         
+         			const el = document.getElementById('addProductModal');
+         			if (!el || !window.bootstrap) {
+         				console.error("Bootstrap JS not loaded or element not found!");
+         				return;
+         			}
+         
+         			const modal = new bootstrap.Modal(el, {backdrop: 'static'});
+         			modal.show();
+         		};
+         		<!--				-->
+         
+         
+         		// ---------- Party modal open/close using Bootstrap 5 API ----------
+         		$scope.openPartyModal = function () {
+         			// prepare formData
+         			$scope.partySuggestions = [];
+         			$scope.formData = $scope.bill.party && Object.keys($scope.bill.party).length ? angular.copy($scope.bill.party) : {};
+         			$scope.isUpdateMode = !!($scope.formData && $scope.formData.id);
+         			const el = document.getElementById('addPartyModal');
+         			if (!el) return;
+         			const modal = new bootstrap.Modal(el, {backdrop: 'static'});
+         			modal.show();
+         		};
+         
+         		$scope.closePartyModal = function () {
+         			const el = document.getElementById('addPartyModal');
+         			if (!el) return;
+         			const m = bootstrap.Modal.getInstance(el);
+         			if (m) m.hide();
+         		};
+         
+         		// To support "open update" flow (load latest)
+         		$scope.openUpdatePartyModal = function () {
+         			if (!$scope.bill.party || !$scope.bill.party.id) return alert('Select a party first');
+         			$http.get('http://localhost:8080/api/party/' + $scope.bill.party.id)
+         				.then(function (resp) {
+         					$scope.formData = resp.data || angular.copy($scope.bill.party);
+         					$scope.isUpdateMode = true;
+         					const el = document.getElementById('addPartyModal');
+         					const modal = new bootstrap.Modal(el, {backdrop: 'static'});
+         					modal.show();
+         				})
+         				.catch(function (err) {
+         					console.warn('Could not load party by id, using cached values', err);
+         					$scope.formData = angular.copy($scope.bill.party);
+         					$scope.isUpdateMode = true;
+         					const el = document.getElementById('addPartyModal');
+         					const modal = new bootstrap.Modal(el, {backdrop: 'static'});
+         					modal.show();
+         				});
+         		};
+         		// Save new prodct
+         		/**	$scope.openProductModal = function (product) {
+         				$scope.formData = product ? angular.copy(product) : {};
+         				$scope.isUpdateMode = !!product;
+         				const el = document.getElementById('addproductModal');
+         				const modal = new bootstrap.Modal(el, {backdrop: 'static'});
+         				modal.show();
+         			};**/
+         		$scope.loadProducts = function () {
+         			$http.get('http://localhost:8080/api/product').then(function (resp) {
+         				$scope.products = resp.data;
+         			});
+         		};
+         		$scope.loadProducts();
+         		$scope.closeProductModal = function () {
+         			const el = document.getElementById('addproductModal');
+         			const modal = bootstrap.Modal.getInstance(el);
+         			if (modal) modal.hide();
+         		};
+         		/**				<button type="button" class="btn btn-warning btn-sm" ng-click="openProductModal(product)">
+         							Edit
+         						</button>
+         		**/
+         		$scope.saveProduct = function () {
+         			const url = $scope.isUpdateMode ? 'http://localhost:8080/api/product/' + $scope.formData.id : 'http://localhost:8080/api/product';
+         			const method = $scope.isUpdateMode ? 'PUT' : 'POST';
+         
+         			$http({
+         				method: method,
+         				url: url,
+         				data: $scope.formData
+         			}).then(function (resp) {
+         				alert('Product saved!');
+         				$scope.closeProductModal();
+         				$scope.loadProducts(); // reload list
+         			}).catch(function (err) {
+         				console.error(err);
+         				alert('Error saving product');
+         			});
+         		};
+         
+         		// Save new party
+         		$scope.saveDetails = function () {
+         			console.log("Save Clicked!", $scope.party);
+         			alert("Save function executed!");
+         			if (!$scope.formData.partyName || !$scope.formData.partyName.trim()) return alert('Party Name required');
+         
+         			$http.post('http://localhost:8080/api/party', $scope.formData)
+         				.then(function (resp) {
+         					const saved = resp.data || $scope.formData;
+         					$scope.bill.party = angular.copy(saved);
+         					$scope.bill.partyName = saved.partyName;
+         					$scope.bill.gstNo = saved.gstNo;
+         					$scope.bill.sgstPercent = saved.sgstPercent || 0;
+         					$scope.bill.cgstPercent = saved.cgstPercent || 0;
+         					$scope.closePartyModal();
+         					
+         					alert('Party saved');
+         					  
+         					
+         					
+         				})
+         				.catch(function (err) {
+         					console.error('Error saving party', err);
+         					alert('Error saving party');
+         				});
+         		};
+         
+         		// Update existing party
+         		$scope.updateDetails = function () {
+         			if (!$scope.formData.id) return alert('No party id to update');
+         
+         			$http.put('http://localhost:8080/api/party/' + $scope.formData.id, $scope.formData)
+         				.then(function (resp) {
+         					const updated = resp.data || $scope.formData;
+         					if ($scope.bill.party && $scope.bill.party.id === updated.id) {
+         						$scope.bill.party = angular.copy(updated);
+         						$scope.bill.partyName = updated.partyName;
+         						$scope.bill.gstNo = updated.gstNo;
+         						$scope.bill.sgstPercent = updated.sgstPercent || 0;
+         						$scope.bill.cgstPercent = updated.cgstPercent || 0;
+         					}
+         					$scope.closePartyModal();
+         					alert('Party updated');
+         				})
+         				.catch(function (err) {
+         					console.error('Error updating party', err);
+         					alert('Error updating party');
+         				});
+         		};
+         
+         		// ---------------- Save Bill via API ----------------
+         		$scope.saveBill = function (isAuto) {
+         			if (!$scope.bill.items || !$scope.bill.items.length) return alert('Add at least one product');
+         			$scope.recalcTotals();
+         
+         			const payload = {
+         				gstNo: $scope.bill.gstNo,
+         				sgstPercent: $scope.bill.sgstPercent,
+         				cgstPercent: $scope.bill.cgstPercent,
+         				billNo: $scope.bill.billNo || null,
+         				transactionType: $scope.bill.transactionType,
+         				billDate: $scope.bill.billDate,
+         				dueDate: $scope.bill.dueDate,
+         				outstandingAmount: $scope.bill.outstandingAmount || 0,
+         				totalItem: $scope.totals.totalItem,
+         				totalQuantity: $scope.totals.totalQuantity,
+         				gst: $scope.totals.gst,
+         				totalReplace: $scope.totals.totalReplace,
+         				totalFree: $scope.totals.totalFree,
+         				totalAmount: $scope.totals.totalAmount,
+         				party: {id: $scope.bill.party && $scope.bill.party.id ? $scope.bill.party.id : null},
+         				items: $scope.bill.items.map(it => ({
+         					id: it.productId,
+         					name: it.name,
+         					packing: it.packing,
+         					company: it.company,
+         					qty: it.qty,
+         					batch: it.batch,
+         					expiry: it.expiry,
+         					mrp: it.mrp,
+         					rate: it.rate,
+         					amount: it.amount,
+         					gstPercent: it.gstPercent
+         				}))
+         			};
+         
+         			$http.post('/api/bill', payload)
+         				.then(function (resp) {
+         					const saved = resp.data || {};
+         					if (!isAuto) alert('Bill saved successfully.');
+         					$scope.savedBills.push({
+         						billNo: saved.billNo || payload.billNo || ('B' + (new Date().getTime() % 100000)),
+         						billDate: saved.billDate || payload.billDate,
+         						transactionType: payload.transactionType,
+         						totalQuantity: payload.totalQuantity,
+         						totalAmount: payload.totalAmount
+         					});
+         					$scope.bill = {
+         						gstNo: '', sgstPercent: 0, cgstPercent: 0, billNo: '', transactionType: 'Cash',
+         						billDate: (new Date()).toISOString().substr(0, 10), dueDate: (new Date()).toISOString().substr(0, 10),
+         						outstandingAmount: 0, totalItem: 0, totalQuantity: 0, gst: 0, totalReplace: 0, totalFree: 0, totalAmount: 0,
+         						party: {}, items: []
+         					};
+         					$scope.recalcTotals();
+         				})
+         				.catch(function (err) {
+         					console.error('Error saving bill', err);
+         					alert('Error saving bill');
+         				});
+         		};
+         
+         	}])
+         
+         	// Party modal controller removed jQuery listeners and uses Bootstrap events if required
+         	.controller('PartyModalCtrl', ['$scope', '$http', function ($scope, $http) {
+         		// kept minimal — main modal behavior handled in MainCtrl using bootstrap.Modal
+         		// This controller remains if you want modal-specific logic in future.
+         	}]);
+      </script>
+   </body>
+</html>

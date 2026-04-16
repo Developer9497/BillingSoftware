@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html ng-app="loginApp">
+<head>
+    <meta charset="UTF-8">
+    <title>AngularJS JWT Login</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular-cookies.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular-resource.min.js"></script>
+    <style>
+        body { font-family: Arial; background: #f2f2f2; }
+        .login-container {
+            width: 300px; margin: 100px auto; padding: 30px;
+            background: white; border-radius: 8px; box-shadow: 0 0 10px #aaa;
+        }
+        h2 { text-align: center; }
+        input { width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #007BFF; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .error { color: red; text-align: center; }
+    </style>
+</head>
+<body ng-controller="LoginController">
+
+<div class="login-container" ng-show="!loggedIn">
+    <h2>Login</h2>
+    <form ng-submit="login()">
+        <input type="text" ng-model="user.userGmail" placeholder="Email" required>
+        <input type="password" ng-model="user.password" placeholder="Password" required>
+        <button type="submit">Login</button>
+    </form>
+    <p class="error" ng-if="error">{{error}}</p>
+</div>
+
+<script>
+var app = angular.module('loginApp', ['ngCookies', 'ngResource']);
+
+app.controller('LoginController', ['$scope', '$http', '$window', '$cookies', function($scope, $http, $window, $cookies) {
+    $scope.user = {};
+    $scope.loggedIn = false;
+    $scope.error = '';
+
+    $scope.login = function() {
+        $http.post('http://localhost:8080/login', $scope.user)
+            .then(function(response) {
+                if(response.data.token) {
+                    // Save JWT token in localStorage or cookie
+                    localStorage.setItem('jwtToken', response.data.token);
+                    localStorage.setItem('user', JSON.stringify(response.data.user));
+                    $scope.loggedIn = true;
+                    $scope.error = '';
+
+                    // Redirect to inventory page
+                    $window.location.href = '/add-inventry';
+                } else {
+                    $scope.error = 'Invalid credentials';
+                }
+            }, function(error) {
+                $scope.error = error.data?.message || 'Server error or invalid credentials';
+            });
+    };
+
+    $scope.logout = function() {
+        localStorage.removeItem('jwtToken');
+        localStorage.removeItem('user');
+        $scope.user = {};
+        $scope.loggedIn = false;
+        $scope.error = '';
+        $window.location.href = '/login-page';
+    };
+
+    // Check if user is already logged in
+    if(localStorage.getItem('jwtToken')) {
+        $scope.loggedIn = true;
+        $scope.user = JSON.parse(localStorage.getItem('user'));
+    }
+}]);
+</script>
+
+</body>
+</html>
