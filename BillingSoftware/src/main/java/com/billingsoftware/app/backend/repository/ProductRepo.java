@@ -12,7 +12,7 @@ import com.billingsoftware.app.backend.entity.Product;
 @Repository
 public interface ProductRepo extends JpaRepository<Product, Long> {
    // List<Product> searchByName(String name);
-   @Query("SELECT p FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%'))")
+ @Query("SELECT p FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT(:name, '%'))")
   List<Product> searchByName(String name);
 }
 

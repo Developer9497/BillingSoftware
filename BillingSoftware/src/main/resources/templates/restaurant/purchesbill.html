@@ -1116,7 +1116,8 @@
          			if (prodTimer) $timeout.cancel(prodTimer);
          			$scope.productSuggestions = [];
 					if(q=="new"|| q=="NEW"||q=="add"||q=="ADD"){
-											$scope.openProductModal();
+									window.location.href = "http://localhost:8080/add-product";	//	$scope.openProductModal();
+										
 										}
          			if (!q || q.length < 2) return;
          			prodTimer = $timeout(function () {
@@ -1285,7 +1286,8 @@
          			$scope.partySuggestions = [];
          			
          			if(q=="new"|| q=="NEW"||q=="add"||q=="ADD"){
-						$scope.openPartyModal();
+						//$scope.openPartyModal();
+						 window.location.href = "http://localhost:8080/add-party";
 					}
          			
          			if (!q || q.length < 2)return;

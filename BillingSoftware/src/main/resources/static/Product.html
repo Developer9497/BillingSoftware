@@ -518,7 +518,7 @@
 
 			// SEARCH PRODUCT (same like your party search)
 			$scope.searchProduct = function (q) {
-
+$scope.isUpdateMode = true;
 			    if (productTimer) $timeout.cancel(productTimer);
 			    $scope.productSuggestions = [];
 
@@ -545,7 +545,7 @@
 
 			    // OR if you only want name:
 			    // $scope.formData.name = p.name;
-
+$scope.isUpdateMode = true;
 			    // Clear suggestions
 			    $scope.productSuggestions = [];
 			    $scope.productHighlightIndex = -1;

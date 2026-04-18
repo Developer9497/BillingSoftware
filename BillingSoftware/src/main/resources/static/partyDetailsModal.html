@@ -29,6 +29,31 @@
 			background-color: #f8f9fa;
 			font-weight: bold;
 		}
+		.suggestions-box {
+    z-index: 2000;
+    max-height: 180px;
+    overflow-y: auto;
+    width: 100%;
+    border: 1px solid #ddd;
+    background: #fff;
+}
+
+.active-item {
+    background-color: #007bff !important;
+    color: white;
+}
+
+.card {
+    border-radius: 10px;
+}
+
+.card-header {
+    font-size: 1rem;
+}
+
+.form-control-sm {
+    border-radius: 6px;
+}
 	</style>
 </head>
 
@@ -58,16 +83,21 @@
 								<label for="partyName" class="col-sm-3 col-form-label">Party Name</label>
 								<div class="col-sm-9">
 									<input type="text" class="form-control form-control-sm" id="partyName"
-										ng-model="formData.partyName" next-focus tabindex="3">
+										ng-model="formData.partyName" next-focus tabindex="3"
+										ng-keydown="onSuggestionKeyDown($event, suggestions, 'partySuggestionHighlightIndex', 'selectParty')"
+										ng-keyup="searchParty(formData.partyName)">
 									<!-- Party Suggestions -->
-									<ul class="list-group position-absolute"
-										style="z-index:1000; max-height:150px; overflow-y:auto;"
-										ng-if="suggestions.length > 0">
-										<li class="list-group-item p-1" ng-repeat="p in suggestions"
-											ng-click="selectParty(p)">
-											{{p.partyName}}
-										</li>
-									</ul>
+									<ul class="list-group position-absolute suggestions-box"
+    ng-if="suggestions.length > 0">
+
+    <li class="list-group-item p-1"
+        ng-repeat="p in suggestions track by $index"
+        ng-click="selectParty(p)"
+        ng-class="{'active-item': $index === partySuggestionHighlightIndex}">
+
+        {{p.partyName}}
+    </li>
+</ul>
 								</div>
 							</div>
 
@@ -157,36 +187,15 @@
 		 */
 		app.directive('nextFocus', function () {
 			return {
-				// Priority 0, so it runs after standard input directives
 				restrict: 'A',
 				link: function (scope, element, attrs) {
-					element.bind('keydown', function (e) {
-						// Check if the key pressed is 'Enter' (keyCode 13)
-						if (e.which === 13) {
-							e.preventDefault(); // Prevent default form submission or new line
-
-							// 1. Get the current element's tabindex
-							var currentTabIndex = parseInt(attrs.tabindex);
-
-							if (isNaN(currentTabIndex)) {
-								console.warn("Input element is missing a valid tabindex attribute.");
-								return;
-							}
-
-							// 2. Calculate the next desired tabindex
-							var nextTabIndex = currentTabIndex + 1;
-
-							// 3. Find the next element using the calculated tabindex
-							// Query selector finds the element with the specified tabindex anywhere in the document
-							var nextElement = document.querySelector('[tabindex="' + nextTabIndex + '"]');
-
+					element.on('keypress', function (event) {
+						if (event.which === 13) { // Enter key
+							event.preventDefault();
+							var tabIndex = parseInt(element.attr('tabindex'));
+							var nextElement = document.querySelector('[tabindex="' + (tabIndex + 1) + '"]');
 							if (nextElement) {
-								// 4. Focus the next element
 								nextElement.focus();
-							} else {
-								// If no element with the next tabindex is found, 
-								// you might want to automatically submit the form or stop.
-								console.log("Reached last focusable element in sequence.");
 							}
 						}
 					});
@@ -194,13 +203,105 @@
 			};
 		});
 
-		// AngularJS Controller (kept the same as it was correct)
-		app.controller('partyDetailsCtrl', function ($scope, $http) {
+		// AngularJS Controller
+		app.controller('partyDetailsCtrl', ['$scope', '$timeout', '$http', '$location', '$document', function ($scope, $timeout, $http, $location, $document) {
+
+			// Initialize highlight index for suggestions
+			$scope.partySuggestionHighlightIndex = -1;
+			let partyTimer = null;
+
+			// Auto-focus on Party Name input when page loads
+			$timeout(function () {
+				var partyNameInput = document.getElementById('partyName');
+				if (partyNameInput) {
+					partyNameInput.focus();
+				}
+			}, 100);
+
+			$scope.onSuggestionKeyDown = function (event, suggestions, indexName, selectFunction) {
+
+    if (!suggestions || suggestions.length === 0) return;
+
+    let idx = $scope[indexName] ?? -1;
+
+    if (event.key === "ArrowDown") {
+        event.preventDefault();
+
+        $scope.$apply(() => {
+            if (idx < suggestions.length - 1) {
+                $scope[indexName] = idx + 1;
+            }
+        });
+
+        scrollToItem();
+    }
+
+    else if (event.key === "ArrowUp") {
+        event.preventDefault();
+
+        $scope.$apply(() => {
+            if (idx > 0) {
+                $scope[indexName] = idx - 1;
+            }
+        });
+
+        scrollToItem();
+    }
+
+    else if (event.key === "Enter") {
+        event.preventDefault();
+
+        let selectIdx = $scope[indexName] >= 0 ? $scope[indexName] : 0;
+        let item = suggestions[selectIdx];
+
+        if (item) {
+            $scope.$apply(() => {
+                $scope[selectFunction](item);
+            });
+        }
+    }
+
+    // 🔥 Auto scroll function
+    function scrollToItem() {
+        setTimeout(() => {
+            let list = document.querySelectorAll(".list-group-item");
+            if (list && list[$scope[indexName]]) {
+                list[$scope[indexName]].scrollIntoView({
+                    block: "nearest"
+                });
+            }
+        }, 0);
+    }
+};
+			// Search for parties with debounce
+			$scope.searchParty = function (q) {
+				if (partyTimer) $timeout.cancel(partyTimer);
+				$scope.suggestions = [];
+				$scope.partySuggestionHighlightIndex = -1;
+
+				// Shortcut to add new party
+				// if (q == "new" || q == "NEW" || q == "add" || q == "ADD") {
+				// 	//window.location.href = "http://localhost:8080/add-party";
+				// }
+
+				if (!q || q.length < 2) return;
+
+				partyTimer = $timeout(function () {
+					$http.get('/api/party/search?name=' + encodeURIComponent(q))
+						.then(function (resp) {
+							$scope.suggestions = resp.data || [];
+						})
+						.catch(function (err) {
+							console.error('Party search error', err);
+							$scope.suggestions = [];
+						});
+				}, 150);
+			};
 
 			// Initialize form data
 			$scope.formData = {
 				vouNo: '',
-				vouDate: '2025-11-17', // Pre-fill date as per image
+				vouDate: '2025-11-17',
 				partyName: '',
 				addressLine1: '',
 				addressLine2: '',
@@ -216,31 +317,15 @@
 				sgstPercent: 0,
 				cgstPercent: 0,
 				billNo: '',
-				transactionType: 'Credit', // Default selection
+				transactionType: 'Credit',
 				billDate: '2025-11-17',
 				dueDate: '2025-11-17',
 				outstandingAmount: 0.00,
 				isDataOk: 'Y'
 			};
 
-			//	$scope.formData = {};
 			$scope.suggestions = [];
 			$scope.isUpdateMode = false;
-
-			// ============================
-			// 1️⃣ Auto Search on Party Name
-			// ============================
-			$scope.$watch("formData.partyName", function (newValue) {
-				if (!newValue || newValue.length < 2) {
-					$scope.suggestions = [];
-					return;
-				}
-
-				$http.get("http://localhost:8080/api/party/search?name=" + newValue)
-					.then(function (response) {
-						$scope.suggestions = response.data;
-					});
-			});
 
 			// ============================
 			// 2️⃣ Select party from list
@@ -249,6 +334,7 @@
 				$scope.formData = angular.copy(party); // Auto-fill all fields
 				$scope.isUpdateMode = true;            // Show update button
 				$scope.suggestions = [];               // Hide suggestion dropdown
+				$scope.partySuggestionHighlightIndex = -1; // Reset highlight
 			};
 
 			// ============================
@@ -261,13 +347,14 @@
 					return;
 				}
 
-				$http.post("http://localhost:8080/api/party", $scope.formData)
+				$http.post("/api/party", $scope.formData)
 					.then(function () {
 						alert("Record Saved Successfully!");
 						$scope.formData = {};
 						$scope.isUpdateMode = false;
-					}, function () {
+					}, function (error) {
 						alert("Error while saving data!");
+						console.error(error);
 					});
 			};
 
@@ -276,17 +363,18 @@
 			// ============================
 			$scope.updateDetails = function () {
 
-				$http.put("http://localhost:8080/api/party/" + $scope.formData.id, $scope.formData)
+				$http.put("/api/party/" + $scope.formData.id, $scope.formData)
 					.then(function () {
 						alert("Record Updated Successfully!");
 						$scope.isUpdateMode = false;
 						$scope.formData = {};
-					}, function () {
+					}, function (error) {
 						alert("Error while updating!");
+						console.error(error);
 					});
 			};
 
-		});
+		}]);
 	</script>
 </body>
 

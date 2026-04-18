@@ -389,15 +389,31 @@
 		    };
 		});
 
-		//app.controller("ProductController", function ($scope, $http) {
-			app.controller('ProductController', ['$scope', '$timeout', '$http', function ($scope, $timeout, $http) {
+		//escap to back page on product page 
+			app.controller('ProductController', ['$scope', '$timeout', '$http', '$location', '$document', function ($scope, $timeout, $http, $location, $document) {
 
 			const API = "/api/product";
 			    const MASTER_API = "http://localhost:8080/api/master";
 
 			    $scope.formData = {};
 				$scope.loadingProduct = true;
-				
+				 function handleEsc(event) {
+        if (event.key === "Escape") {
+            $scope.$apply(function () {
+               window.location.href = "http://localhost:8080/add-purchesbill";
+            });
+        }
+    }
+
+    $document.on("keydown", handleEsc);
+
+    // Clean up (important)
+    $scope.$on("$destroy", function () {
+        $document.off("keydown", handleEsc);
+    });
+//escap to back page on product page 
+
+
 				$scope.onSuggestionKeyDown = function(event, list, indexVar, selectFnName) {
 
 				    if (!list || !list.length) return;
@@ -424,6 +440,7 @@
 				    }
 
 				    else if (event.key === "Escape") {
+						 window.location.href = "/add-purchesbill";
 				        $scope.productSuggestions = [];
 				        $scope.productHighlightIndex = -1;
 				    }
@@ -542,7 +559,7 @@
 
 			    // ✅ Fill entire form
 			    $scope.formData = angular.copy(p);
-
+$scope.isUpdateMode = true;
 			    // OR if you only want name:
 			    // $scope.formData.name = p.name;
 

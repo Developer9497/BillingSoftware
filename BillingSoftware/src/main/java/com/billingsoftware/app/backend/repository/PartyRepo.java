@@ -13,7 +13,7 @@ import com.billingsoftware.app.backend.entity.PartyDetails;
 public interface PartyRepo extends JpaRepository<Party, Long> {
     Optional<Party> findByGstNo(String gstNo);
     
-    @Query("SELECT p FROM Party p WHERE LOWER(p.partyName) LIKE LOWER(CONCAT('%', :name, '%'))")
+    @Query("SELECT p FROM Party p WHERE LOWER(p.partyName) LIKE LOWER(CONCAT(:name, '%'))")
     List<Party> searchByName(String name);
 }
 
