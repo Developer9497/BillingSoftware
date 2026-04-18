@@ -137,21 +137,25 @@
 
 		/* ===== KEYBOARD HIGHLIGHT ===== */
 		.highlighted {
-		    background-color: #0d6efd !important;
-		    color: #fff !important;
+		    background-color: #e2b3c9 !important;
+		    color: #000000 !important;
 		}
 
 		/* ===== BATCH DROPDOWN ===== */
-		.batch-dropdown {
-		    position: absolute;
-		    z-index: 9999;
-		    background: #fff;
-		    border: 1px solid #ccc;
-		    max-height: 250px;
-		    overflow-y: auto;
-		    border-radius: 4px;
-		}
+	.batch-dropdown {
+    position: absolute;
+    z-index: 2000;
+    width: 100%;
+    max-height: 220px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #ccc;
+}
 
+/* Highlight row */
+.table-primary {
+    background-color: #cfe2ff !important;
+}
 		/* ===== BATCH TABLE ===== */
 		.batch-table td,
 		.batch-table th {
@@ -544,38 +548,48 @@
                                     </a>
                                  </div>
                               </div>
-                              <div class="batch-dropdown" ng-if="showBatchDropdown" tabindex="0"
-                                 ng-keydown="onSuggestionKeyDown($event, batchList, 'batchHighlightIndex', 'selectBatch')">
-                                 <table class="table table-sm table-bordered batch-table mb-0">
-                                    <thead>
-                                       <tr>
-                                          <th>Batch</th>
-                                          <th>Expiry</th>
-                                          <th>MRP</th>
-                                          <th>TR Rate</th>
-                                          <th>Purchase Rate</th>
-                                          <th>Stock</th>
-                                       </tr>
-                                    </thead>
-                                    <tbody tabindex="0"
-                                       ng-keydown="onSuggestionKeyDown($event, batchList, 'batchHighlightIndex', 'selectBatch')">
-                                       <tr ng-repeat="b in batchList track by b.id"
-                                          ng-class="{'highlighted': $index === batchHighlightIndex}"
-                                          ng-click="selectBatch(b)">
-                                          <td>{{b.batch}}</td>
-                                          <td>{{b.expiry | date:'MM/yyyy'}}</td>
-                                          <td>{{b.mrp}}</td>
-                                          <td>{{b.trRate}}</td>
-                                          <td>{{b.purchaseRate}}</td>
-                                          <td>{{b.currentStock}}</td>
-                                       </tr>
-                                       												<button class="btn btn-sm btn-primary"
-                                       													ng-click="openAddBatchRow()">+</button>
-                                       <button class="btn btn-sm btn-primary"
-                                          ng-click="openAddBatch()">+</button>
-                                    </tbody>
-                                 </table>
-                              </div>
+                              <div class="batch-dropdown"
+     ng-if="showBatchDropdown"
+     tabindex="0"
+     id="batchDropdown"
+     ng-keydown="onSuggestionKeyDown($event, batchList, 'batchHighlightIndex', 'selectBatch')">
+
+    <table class="table table-sm table-bordered mb-0">
+        <thead class="table-light">
+            <tr>
+                <th>Batch</th>
+                <th>Expiry</th>
+                <th>MRP</th>
+                <th>TR Rate</th>
+                <th>Purchase Rate</th>
+                <th>Stock</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr ng-repeat="b in batchList track by b.id"
+                ng-click="selectBatch(b)"
+                ng-class="{'table-primary': $index === batchHighlightIndex}"
+                style="cursor:pointer">
+
+                <td>{{b.batch}}</td>
+                <td>{{b.expiry | date:'MM/yyyy'}}</td>
+                <td>{{b.mrp}}</td>
+                <td>{{b.trRate}}</td>
+                <td>{{b.purchaseRate}}</td>
+                <td>{{b.currentStock}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Add Batch Button -->
+    <div class="text-end p-1">
+        <button class="btn btn-sm btn-primary"
+                ng-click="openAddBatch()">
+            + Add Batch
+        </button>
+    </div>
+</div>
                            </td>
                            <td><input class="form-control form-control-sm" ng-model="newItem.packing"
                               readonly />
@@ -765,65 +779,99 @@
                </div>
             </div>
          </div>
-         
-         <div class="modal overlay-modal" tabindex="-1" role="dialog" ng-show="showAddBatchModal"
-            style="background:rgba(0,0,0,0.4)">
-            <div class="" role="document" style="
-               ">
-               <div class="card" style="
-                  padding: 15px;
-                  ">
-                  <div class="">
-                     <p class="modal-title ng-binding">Batches for: {{selectedProduct.name}}</p>
-                     <button class="btn-close" ng-click="closeAddBatch()" aria-label="Close" style="
-                        float: right;
-                        "></button>
-                  </div>
-                  <div class="">
-                     <table>
-                        <!--							<tr ng-if="showAddBatchRow">-->
-                        <tbody>
-                           <tr>
-                              <th>Batch</th>
-                              <th>Expiry</th>
-                              <th>MRP</th>
-                              <th>TR Rate</th>
-                              <th>Purchase Rate</th>
-                              <th>Stock</th>
-                           </tr>
-                           <tr>
-                              <td>
-                                 <input id="newBatchInput" type="text" ng-model="newBatch.batch"
-                                    class="form-control ng-pristine ng-valid ng-empty ng-touched"
-                                    placeholder="Batch No">
-                              </td>
-                              <td><input type="date" ng-model="newBatch.expiry"
-                                 class="form-control ng-pristine ng-untouched ng-valid ng-empty"></td>
-                              <td><input type="number" ng-model="newBatch.mrp"
-                                 class="form-control ng-pristine ng-untouched ng-valid ng-not-empty"
-                                 placeholder="MRP"></td>
-                              <td><input type="number" ng-model="newBatch.trRate"
-                                 class="form-control ng-pristine ng-untouched ng-valid ng-not-empty"
-                                 placeholder="TR Rate"></td>
-                              <td><input type="number" ng-model="newBatch.purchaseRate"
-                                 class="form-control ng-pristine ng-untouched ng-valid ng-not-empty"
-                                 placeholder="Purchase Rate"></td>
-                              <td><input type="number" ng-model="newBatch.currentStock"
-                                 class="form-control ng-pristine ng-untouched ng-valid ng-not-empty"
-                                 placeholder="Stock"></td>
-                              <td>
-                                 <button type="button" class="btn btn-sm btn-success"
-                                    ng-click="saveBatchLocal(newBatch)">
-                                 Add Batch
-                                 </button>
-                              </td>
-                           </tr>
-                        </tbody>
-                     </table>
-                  </div>
-               </div>
+         <div class="modal overlay-modal"
+     ng-show="showAddBatchModal"
+     ng-class="{'show': showAddBatchModal}"
+     style="display:block; background: rgba(0,0,0,0.4);">
+
+    <div class="modal-dialog modal-md modal-dialog-centered">
+        <div class="modal-content p-2">
+
+            <!-- HEADER -->
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">
+                    Add Batch - {{selectedProduct.name}}
+                </h6>
+                <button type="button"
+                        class="btn-close"
+                        ng-click="closeAddBatch()">
+                </button>
             </div>
-         </div>
+
+            <!-- BODY -->
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered mb-2 text-center">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Batch</th>
+                            <th>Expiry</th>
+                            <th>MRP</th>
+                            <th>TR</th>
+                            <th>Pur</th>
+                            <th>Stock</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <td>
+                                <input id="newBatchInput"
+                                       type="text"
+                                       ng-model="newBatch.batch"
+                                       class="form-control form-control-sm"
+                                       placeholder="Batch">
+                            </td>
+
+                            <td>
+                                <input type="date"
+                                       ng-model="newBatch.expiry"
+                                       class="form-control form-control-sm">
+                            </td>
+
+                            <td>
+                                <input type="number"
+                                       ng-model="newBatch.mrp"
+                                       class="form-control form-control-sm">
+                            </td>
+
+                            <td>
+                                <input type="number"
+                                       ng-model="newBatch.trRate"
+                                       class="form-control form-control-sm">
+                            </td>
+
+                            <td>
+                                <input type="number"
+                                       ng-model="newBatch.purchaseRate"
+                                       class="form-control form-control-sm">
+                            </td>
+
+                            <td>
+                                <input type="number"
+                                       ng-model="newBatch.currentStock"
+                                       class="form-control form-control-sm">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="text-end">
+                <button class="btn btn-sm btn-secondary me-1"
+                        ng-click="closeAddBatch()">
+                    Cancel
+                </button>
+
+                <button class="btn btn-sm btn-success"
+                        ng-click="saveBatchLocal(newBatch)">
+                    Save
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
          <!-- ADD / EDIT PRODUCT MODAL -->
          <div class="modal fade" id="addProductModal" tabindex="-1" aria-hidden="true">
 <!--			//<div ng-include="'Product.html'"></div>-->
@@ -1152,25 +1200,32 @@
          			};
          
          			$scope.productSuggestions = [];
-         			//	$scope.showBatchModal = true;  // Open modal
-         			// Load batch list
+         			//$scope.batchHighlightIndex=-1;
+        // $scope.openAddBatch();
          			$http.get('/api/batch/product/' + p.id)
          				.then(function (resp) {
          					$scope.batchList = resp.data || [];
-         					$scope.batchHighlightIndex = ($scope.batchList.length > 0) ? 0 : -1;
-         
+         					//$scope.batchHighlightIndex = ($scope.batchList.length > 0) ? 0 : -1;
+							
          					// Show inline batch dropdown
          					$scope.showBatchDropdown = $scope.batchList.length > 0;
 							if(!$scope.batchList.length > 0){
-								$scope.openAddBatch()
+								//$scope.openAddBatch()
 							}
 							
 							
          					// Focus batch dropdown to capture arrow keys
-         					$timeout(function () {
-         						var el = document.querySelector('.batch-dropdown');
-         						if (el) el.focus();
-         					}, 50);
+         					$scope.showBatchDropdown = true;
+$timeout(() => {
+    let rows = document.querySelectorAll("#batchDropdown tbody tr");
+    if (rows[$scope.batchHighlightIndex]) {
+        rows[$scope.batchHighlightIndex].scrollIntoView({block: "nearest"});
+    }
+});
+$timeout(function () {
+    let el = document.getElementById("batchDropdown");
+    if (el) el.focus();
+}, 50);
          				})
          				.catch(function (err) {
          					console.warn('Error loading batches', err);
@@ -1183,6 +1238,7 @@
          		$scope.openBatchModal = function () {
          			$scope.showBatchModal = true;
          			$scope.showAddBatchModal = false;
+					
          		};
          		$scope.closeBatchModal = function () {
          			$scope.showBatchModal = false;
@@ -1200,6 +1256,7 @@
          		};
          
          		$scope.openAddBatch = function () {
+				//	alert('Add Batch for product: ' + ($scope.selectedProduct ? $scope.selectedProduct.name : 'None'));
          			if (!$scope.selectedProduct || !$scope.selectedProduct.id) return alert('Select product first');
          			$scope.showAddBatchModal = true;
          			// Focus on first input after row appears
